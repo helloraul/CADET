@@ -13,8 +13,8 @@ db = SQLAlchemy()
 Base = db.make_declarative_base(db.Model)
 
 def CadEngine():
-    return db.create_engine('sqlite:///cadet_lite.db')
-    #return db.create_engine('mysql://cadet:cadet@localhost/cadet')
+    #return db.create_engine('sqlite:///cadet_lite.db')
+    return db.create_engine('mysql://cadet:cadet@localhost/cadet')
 
 class Instructor(Base):
     # Here we define columns for the 'instructors' table
