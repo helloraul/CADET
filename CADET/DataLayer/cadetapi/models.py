@@ -12,81 +12,104 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 Base = db.make_declarative_base(db.Model)
 
+def CadEngine():
+    #return db.create_engine('sqlite:///cadet_lite.db')
+    return db.create_engine('mysql://cadet:cadet@localhost/cadet')
+
 class Instructor(Base):
+    # Here we define columns for the 'instructors' table
+    # Notice that each column is also a normal Python instance attribute.
     __tablename__ = 'instructors'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
 
 class Course(Base):
+    # Define columns for the 'courses' table
     __tablename__ = 'courses'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
-    department = db.Column(db.String(2))
-    program = db.Column(db.Integer)
-    course = db.Column(db.Integer)
-    section = db.Column(db.Integer)
-    semester = db.Column(db.String(4))
+    program = db.Column(db.String(20))
+    modality = db.Column(db.String(50))
+    num_sec = db.Column(db.String(10))
 
 class Comment(Base):
+    # Define columns and relationships for the 'comments' table
     __tablename__ = 'comments'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
     anon_id = db.Column(db.Integer, nullable=False)
-    comment = db.Column(db.Text)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     instructor_id = db.Column(db.Integer, db.ForeignKey('instructors.id'))
-    icom = db.Column(db.Boolean) # True/False = Instructor/Course Comment
+    c_com = db.Column(db.Text) # Course Comment
+    i_com = db.Column(db.Text) # Instructor Comment
+    a_com = db.Column(db.Text) # Additional Comment
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     course = db.relationship(Course)
     instructor = db.relationship(Instructor)
-
-class Stop_Word(Base):
+ 
+class StopWord(Base):
+    # Define columns for the 'stop_words' table
     __tablename__ = 'stop_words'
     id = db.Column(db.Integer, primary_key=True)
     stop_word = db.Column(db.String(50), unique=True)
 
-class Dataset(Base):
+class DataSet(Base):
+    # Define columns for the 'datasets' table
     __tablename__ = 'datasets'
     id = db.Column(db.Integer, primary_key=True)
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-class Comment_Dataset(Base):
+class CommentDataSet(Base):
+    # Define columns and relationships for the 'com_dat' table
+    # This table maintains the many-to-many relationship between comments and datasets
     __tablename__ = 'com_dat'
     id = db.Column(db.Integer, primary_key=True)
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
     comment = db.relationship(Comment)
-    dataset = db.relationship(Dataset)
+    dataset = db.relationship(DataSet)
 
-class Result_Cache(Base):
-    __tablename__ = 'results_cache'
+class ResultSet(Base):
+    # Define columns for the 'results' table
+    __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
-    topic_cnt = db.Column(db.Integer)
-    word_cnt = db.Column(db.Integer)
-    stop_words = db.Column(db.String(1000))
-    iterations = db.Column(db.Integer)
+    topic_cnt = db.Column(db.Integer) # number of topics
+    word_cnt = db.Column(db.Integer)  # words per topic
+    stop_words = db.Column(db.String(1000)) # concatenated list of stop-words used
+    iterations = db.Column(db.Integer) # number of iterations
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    #query = Column(String(1000), unique=True)
-    #result = Column(Text)
-
-class Result_Topic(Base):
-    __tablename__ = 'result_cache_topics'
+    
+class ResultTopic(Base):
+    __tablename__ = 'result_topics'
     id = db.Column(db.Integer, primary_key=True)
-    result_id = db.Column(db.Integer, db.ForeignKey('results_cache.id'))
+    result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
     topic = db.Column(db.String(255))
-    result = db.relationship(Result_Cache)
+    result = db.relationship(ResultSet)
 
-class Result_Detail(Base):
-    __tablename__ = 'result_cache_comments'
+class TopicWord(Base):
+    __tablename__ = 'topic_words'
     id = db.Column(db.Integer, primary_key=True)
-    result_id = db.Column(db.Integer, db.ForeignKey('results_cache.id'))
+    topic_id = db.Column(db.Integer, db.ForeignKey('result_topics.id'))
+    word = db.Column(db.String(255))
+    topic = db.relationship(ResultTopic)
+
+class ResultDetail(Base):
+    __tablename__ = 'result_comments'
+    id = db.Column(db.Integer, primary_key=True)
+    #result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
+    topic_id = db.Column(db.Integer, db.ForeignKey('result_topics.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
-    sentiment = db.Column(db.Integer) #1,2,3 = neg, neut, pos
-    topic_id = db.Column(db.Integer, db.ForeignKey('result_cache_topics.id'))
-    result = db.relationship(Result_Cache)
+    sentiment = db.Column(db.String(8)) # pos, neg, neutral
+    #result = db.relationship(ResultSet)
+    topic = db.relationship(ResultTopic)
     comment = db.relationship(Comment)
-    topic = db.relationship(Result_Topic)
+    
+def DbSession():
+    engine = CadEngine()
+    Base.metadata.bind = engine
+    sess = db.sessionmaker(bind=engine)
+    return sess()
+
+# Create all tables in the engine. This is equivalent to "Create Table"
+# statements in raw SQL.
+Base.metadata.create_all(CadEngine())
