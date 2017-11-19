@@ -9,7 +9,7 @@ from .controllers.rest.Comment import CommentApi
 from .controllers.rest.Course import CourseApi
 from .controllers.rest.Instr import InstrApi
 from .controllers.rest.Dataset import DatasetApi
-from .controllers.rest.Result import ResultApi
+from .controllers.rest.Results import ResultApi
 
 rest_api = Api()
 

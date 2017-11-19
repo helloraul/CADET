@@ -22,9 +22,10 @@ db.init_app(app)
 rest_api.init_app(app)
 
 # Test route: currently no need for it. consider for future deletion
+@app.route('/hello')
 @app.route('/')
 def index():
     return "Hello, World"
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

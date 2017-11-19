@@ -1,4 +1,4 @@
-from flask_restplus import Resource, fields
+from flask_restful import Resource, fields
 
 def comment_fields():
     define = {

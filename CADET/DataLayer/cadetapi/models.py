@@ -45,7 +45,7 @@ class Comment(Base):
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     course = db.relationship(Course)
     instructor = db.relationship(Instructor)
- 
+
 class StopWord(Base):
     # Define columns for the 'stop_words' table
     __tablename__ = 'stop_words'
@@ -78,7 +78,7 @@ class ResultSet(Base):
     stop_words = db.Column(db.String(1000)) # concatenated list of stop-words used
     iterations = db.Column(db.Integer) # number of iterations
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    
+
 class ResultTopic(Base):
     __tablename__ = 'result_topics'
     id = db.Column(db.Integer, primary_key=True)
@@ -103,7 +103,7 @@ class ResultDetail(Base):
     #result = db.relationship(ResultSet)
     topic = db.relationship(ResultTopic)
     comment = db.relationship(Comment)
-    
+
 def DbSession():
     engine = CadEngine()
     Base.metadata.bind = engine
