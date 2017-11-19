@@ -5,18 +5,18 @@
 
 from flask import abort
 from flask_restful import Resource, marshal_with
-from cadetapi.models import Result
-from .fields import results_fields
+from cadetapi.models import ResultSet
+from .fields import result_fields
 
 
 class ResultApi(Resource):
-    @marshal_with(results_fields)
+    @marshal_with(result_fields)
     def get(self, result_id=None):
         if result_id:
-            result = Result.query.get(result_id)
+            result = ResultSet.query.get(result_id)
             if not result:
                 abort(404)
             return result
         else:
-            results = Result.query.all()
+            results = ResultSet.query.all()
             return results

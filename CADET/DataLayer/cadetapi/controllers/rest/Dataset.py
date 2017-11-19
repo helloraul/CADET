@@ -5,7 +5,7 @@
 
 from flask import abort
 from flask_restful import Resource, marshal_with
-from cadetapi.models import Dataset
+from cadetapi.models import DataSet
 from .fields import dataset_fields
 
 class DatasetApi(Resource):
