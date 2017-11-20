@@ -1,7 +1,7 @@
 #from sqlalchemy import *
 #from sqlalchemy.orm import *
  
-from models import *
+from cadetapi.models import *
 #import Comment as OrigCom
  
 class DbInstructor():
@@ -149,7 +149,8 @@ class DbComment():
 
     def GetId(self, comm):
         self.__clear_comment()
-        self.comment = {**self.comment, **comm}
+        #self.comment = {**self.comment, **comm} # python >= 3.5
+        self.comment.update(comm)
         self.course_id = self.course.GetId(self.comment['course_program'],
                                            self.comment['course_modality'],
                                            self.comment['course_num_sect_id'])
@@ -234,6 +235,16 @@ class DbComment():
         self.comment['instructor_comments'] = ''
         self.comment['additional_comments'] = ''
 
+    def GetAll(self):
+        query = self.sess.query(Comment.id)
+        result = query.all()
+        allcomments = {}
+        #allcomments = []
+        for comment_id in result:
+                allcomments[comment_id[0]] = self.GetComment(comment_id[0])
+                #allcomments.append(self.GetComment(comment_id[0]))
+            
+        return allcomments
 
     def __init__(self):
         # Open session to the database
@@ -324,6 +335,29 @@ class DbDataset():
     def __init__(self):
         self.sess = DbSession()
         self.comment = DbComment()
+
+class DbStopWord():
+    word_list = []
+    word_string = ''
+
+    def FullList(self):
+        query = self.sess.query(StopWord.stop_word)
+        result = query.all()
+        if not result:
+            # Primary Key not found in database
+            return False
+        else:
+            del self.stop_list[:]
+            self.word_string = ''
+            for word in result:
+                # Re-initialize the comment object each time,
+                # or else we'll just overwrite by reference
+                self.word_list.append(word[0])
+            self.word_string = ' '.join(word_list)
+            return self.word_string
+
+    def __init__(self):
+        self.sess = DbSession()
 
 class DbResult():
     pk = 0
