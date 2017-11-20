@@ -17,7 +17,9 @@ rest_api = Api()
 rest_api.add_resource(
     CommentApi,                       # name of class handling requests
     '/api/Comment',                   # url to retrieve table
-    '/api/Comment/<int:comment_id>/', # url to retrieve elements in table
+    '/api/Comment/<int:comment_id>',  # url to retrieve elements in table
+    '/api/Comment/',                  # alternative url to retrieve table
+    '/api/Comment/<int:comment_id>/', # alternative url to retrieve elements in table
     endpoint='comment'                # Flask name of API endpoint
     )
 

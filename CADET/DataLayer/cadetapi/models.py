@@ -11,11 +11,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 Base = db.make_declarative_base(db.Model)
-
+"""
 def CadEngine():
     return db.create_engine('sqlite:///cadet_lite.db')
     #return db.create_engine('mysql://cadet:cadet@localhost/cadet')
-
+"""
 class Instructor(Base):
     # Here we define columns for the 'instructors' table
     # Notice that each column is also a normal Python instance attribute.
@@ -105,11 +105,12 @@ class ResultDetail(Base):
     comment = db.relationship(Comment)
 
 def DbSession():
-    engine = CadEngine()
-    Base.metadata.bind = engine
-    sess = db.sessionmaker(bind=engine)
-    return sess()
+    return db.session
+    #engine = CadEngine()
+    #Base.metadata.bind = engine
+    #sess = db.sessionmaker(bind=engine)
+    #return sess()
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.
-Base.metadata.create_all(CadEngine())
+#Base.metadata.create_all(CadEngine())

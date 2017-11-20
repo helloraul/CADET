@@ -19,7 +19,7 @@ class DevConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
         path.join(path.pardir, 'database.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SERVER_NAME = 'www.cadet.api'
+    #SERVER_NAME = 'www.cadet.api'
     DEBUG = True
 
 class TestConfig(Config):
@@ -29,3 +29,9 @@ class TestConfig(Config):
     DEBUG_TB_ENABLED = False
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:////' + db_file.name
+
+class MysqlConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql://cadet:cadet@localhost/cadet'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    #SERVER_NAME = 'localhost'
+    DEBUG = True

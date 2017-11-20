@@ -14,9 +14,14 @@ from .urls import rest_api
 # create app using a config
 app = Flask(__name__)
 app.config.from_object(DevConfig)
+#app.config.from_object(MysqlConfig)
 
 # link sqlalchemy db to the app
 db.init_app(app)
+
+#initialize the database if necessary
+app.app_context().push()
+db.create_all()
 
 # link restful api to the app
 rest_api.init_app(app)
