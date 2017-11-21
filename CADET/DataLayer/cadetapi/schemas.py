@@ -21,4 +21,9 @@ class CommentSchema(ma.Schema):
     instructor_comments = ma.String()
     additional_comments = ma.String()
     #additional_comment = ma.String(attribute='a_com')
-    
+
+class CourseSchema(ma.Schema):
+    course_program = ma.String(attribute='program')
+    course_modality = ma.String(attribute='modality')
+    course_num_sect_id = ma.String(attribute='num_sec')
+
