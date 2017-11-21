@@ -137,6 +137,17 @@ class DbCourse():
         self.num_sec = course.num_sec
         return (self.program, self.modality, self.num_sec)
 
+    def Query(self, pk=None):
+        query = self.sess.query(
+                    Course.program,
+                    Course.modality,
+                    Course.num_sec,
+                )
+        if pk is None:
+            return query.all()
+        else:
+            return query.filter(Course.id==pk).first()
+
     def __init__(self):
         # Open session to the database
         self.sess = DbSession()
