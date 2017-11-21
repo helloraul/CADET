@@ -139,9 +139,9 @@ class DbCourse():
 
     def Query(self, pk=None):
         query = self.sess.query(
-                    Course.program,
-                    Course.modality,
-                    Course.num_sec,
+                    Course.program.label('program'),
+                    Course.modality.label('modality'),
+                    Course.num_sec.label('num_sec'),
                 )
         if pk is None:
             return query.all()

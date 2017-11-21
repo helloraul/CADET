@@ -5,7 +5,9 @@
     https://marshmallow.readthedocs.io/en/latest/
 """
 
-from flask_marshmallow import Marshmallow, fields
+from flask_marshmallow import Marshmallow
+from marshmallow_sqlalchemy import ModelSchema
+from .models import *
 
 ma=Marshmallow()
 
@@ -22,8 +24,11 @@ class CommentSchema(ma.Schema):
     additional_comments = ma.String()
     #additional_comment = ma.String(attribute='a_com')
 
-class CourseSchema(ma.Schema):
+class CourseSchema(ModelSchema):
+    class Meta:
+        model = Course
+    """
     course_program = ma.String(attribute='program')
     course_modality = ma.String(attribute='modality')
     course_num_sect_id = ma.String(attribute='num_sec')
-
+"""
