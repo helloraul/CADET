@@ -12,10 +12,10 @@ class DatasetApi(Resource):
     @marshal_with(dataset_fields)
     def get(self, dataset_id=None):
         if dataset_id:
-            dataset = Dataset.query.get(dataset_id)
+            dataset = DataSet.query.get(dataset_id)
             if not dataset:
                 abort(404)
             return dataset
         else:
-            datasets = Dataset.query.all()
+            datasets = DataSet.query.all()
             return datasets
