@@ -6,4 +6,4 @@ pip install flask
 pip install flask
 pip install flask-sqlalchemy
 pip install flask-restful
-pip install -U marshmellow[reco]
+pip install flask-marshmallow
