@@ -10,7 +10,6 @@ from cadetapi.controllers.database.cadet_insert import DbCourse
 from cadetapi.schemas import CourseSchema
 
 class CourseApi(Resource):
-    @marshal_with(course_fields)
     def get(self, course_id=None):
         inst = DbCourse()
         response = inst.Query(course_id)
