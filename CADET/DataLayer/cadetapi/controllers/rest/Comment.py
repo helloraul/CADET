@@ -4,7 +4,7 @@
 """
 
 from flask import abort
-from flask_restful import Resource, marshal_with, request
+from flask_restful import Resource, request
 from cadetapi.models import Comment
 from cadetapi.controllers.database.cadet_insert import DbComment
 from cadetapi.schemas import CommentSchema
@@ -27,5 +27,5 @@ class CommentApi(Resource):
         # Receive single comment as json object (primarily for unit testing)
         NewComment = DbComment()
         response = {}
-        response['comment_id'] = NewComment.GetId(request.json)
+        response['comment_id'] = NewComment.GetId(request.get_json())
         return response
