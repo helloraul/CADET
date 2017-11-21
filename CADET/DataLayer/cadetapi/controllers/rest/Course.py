@@ -6,16 +6,15 @@
 from flask import abort
 from flask_restful import Resource, marshal_with
 from cadetapi.models import Course
-from .fields import course_fields
+from cadetapi.controllers.database.cadet_insert import DbCourse
+from cadetapi.schemas import CourseSchema
 
 class CourseApi(Resource):
     @marshal_with(course_fields)
     def get(self, course_id=None):
-        if course_id:
-            courses = Course.query.get(course_id)
-            if not courses:
-                abort(404)
-            return courses
+        inst = DbCourse()
+        response = inst.Query(course_id)
+        if course_id is None:
+            return CourseSchema().load(response)
         else:
-            courses = Course.query.all()
-            return courses
+            return CourseSchema(many=True).load(response)
