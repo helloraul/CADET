@@ -4,18 +4,30 @@
 """
 
 from flask import abort
-from flask_restful import Resource, marshal_with
+from flask_restful import Resource, marshal_with, request
 from cadetapi.models import Comment
+from cadetapi.controllers.database.cadet_insert import DbComment
 from .fields import comment_fields
 
 class CommentApi(Resource):
-    @marshal_with(comment_fields)
+    marsh = comment_fields()
+    #@marshal_with(marsh.items())
     def get(self, comment_id=None):
-        if comment_id:
-            comment = Comment.query.get(comment_id)
+        inst = DbComment()
+        if comment_id is None:
+            # No ID was provided, so we'll return everything
+            comments = inst.GetAll()
+            return comments
+        else:
+            # Specific Comment was requested by ID
+            comment = inst.GetComment(comment_id)
             if not comment:
                 abort(404)
             return comment
-        else:
-            comments = Comment.query.all()
-            return comments
+
+    def post(self):
+        # Receive single comment as json object (primarily for unit testing)
+        NewComment = DbComment()
+        response = {}
+        response['comment_id'] = NewComment.GetId(request.json)
+        return response

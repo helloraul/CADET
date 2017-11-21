@@ -5,7 +5,7 @@
 """
 
 from flask import Flask, redirect, url_for
-from .config import DevConfig
+from .config import DevConfig, MysqlConfig
 
 from .models import db
 from .urls import rest_api
