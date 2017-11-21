@@ -7,23 +7,21 @@ from flask import abort
 from flask_restful import Resource, marshal_with, request
 from cadetapi.models import Comment
 from cadetapi.controllers.database.cadet_insert import DbComment
-from .fields import comment_fields
+from cadetapi.schemas import CommentSchema
 
 class CommentApi(Resource):
-    marsh = comment_fields()
-    #@marshal_with(marsh.items())
     def get(self, comment_id=None):
         inst = DbComment()
         if comment_id is None:
             # No ID was provided, so we'll return everything
             comments = inst.GetAll()
-            return comments
+            return CommentSchema(many=True).load(comments)
         else:
             # Specific Comment was requested by ID
             comment = inst.GetComment(comment_id)
             if not comment:
                 abort(404)
-            return comment
+            return CommentSchema().load(comment)
 
     def post(self):
         # Receive single comment as json object (primarily for unit testing)

@@ -8,6 +8,7 @@ from flask import Flask, redirect, url_for
 from .config import DevConfig, MysqlConfig
 
 from .models import db
+from .schemas import ma
 from .urls import rest_api
 
 
@@ -18,6 +19,7 @@ app.config.from_object(DevConfig)
 
 # link sqlalchemy db to the app
 db.init_app(app)
+ma.init_app(app)
 
 #initialize the database if necessary
 app.app_context().push()

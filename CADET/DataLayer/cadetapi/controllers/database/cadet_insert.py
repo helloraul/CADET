@@ -238,11 +238,11 @@ class DbComment():
     def GetAll(self):
         query = self.sess.query(Comment.id)
         result = query.all()
-        allcomments = {}
-        #allcomments = []
+        #allcomments = {}
+        allcomments = []
         for comment_id in result:
-                allcomments[comment_id[0]] = self.GetComment(comment_id[0])
-                #allcomments.append(self.GetComment(comment_id[0]))
+                #allcomments[comment_id[0]] = self.GetComment(comment_id[0])
+                allcomments.append(self.GetComment(comment_id[0]))
             
         return allcomments
 
