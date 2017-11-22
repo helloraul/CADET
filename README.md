@@ -7,3 +7,4 @@ pip install flask
 pip install flask-sqlalchemy
 pip install flask-restful
 pip install flask-marshmallow
+pip install marshmallow-sqlalchemy
