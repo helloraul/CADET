@@ -31,9 +31,9 @@ rest_api.add_resource(
     )
 
 rest_api.add_resource(
-    InstructorApi,                         # name of class handling requests
-    '/api/Instr',                     # url to retrieve table
-    '/api/Instr/<int:instr_id>/',     # url to retrieve elements in table
+    InstructorApi,                    # name of class handling requests
+    '/api/Instructor',                # url to retrieve table
+    '/api/Instructor/<int:instr_id>/',# url to retrieve elements in table
     endpoint='instr'                  # Flask name of API endpoint
     )
 
