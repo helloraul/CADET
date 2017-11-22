@@ -6,7 +6,7 @@
 """
 
 from flask_marshmallow import Marshmallow
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow_sqlalchemy import ModelSchema, field_for
 from .models import *
 
 ma=Marshmallow()
@@ -25,6 +25,9 @@ class CommentSchema(ma.Schema):
     #additional_comment = ma.String(attribute='a_com')
 
 class CourseSchema(ModelSchema):
+    course_program = field_for(Course, 'program', dump_only=True)
+    course_modality = field_for(Course, 'modality', dump_only=True)
+    course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
     class Meta:
         model = Course
     """
