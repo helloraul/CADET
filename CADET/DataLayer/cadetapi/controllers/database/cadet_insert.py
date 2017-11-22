@@ -64,6 +64,16 @@ class DbInstructor():
         self.fname = instr.first_name
         return (self.lname, self.fname)
 
+    def Query(self, pk=None):
+        query = self.sess.query(
+                    Instructor.first_name.label('instructor_first_name'),
+                    Instructor.last_name.label('instructor_last_name'),
+                )
+        if pk is None:
+            return query.all()
+        else:
+            return query.filter(Instructor.id==pk).first()
+
     def __init__(self):
         # Open session to the database
         self.sess = DbSession()

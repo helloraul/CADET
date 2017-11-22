@@ -28,7 +28,8 @@ class CourseSchema(ModelSchema):
     course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
 
 class InstructorSchema(ModelSchema):
-    stub = 'need to do this'
+    instructor_first_name = field_for(Instructor, 'first_name', dump_only=True)
+    instructor_last_name = field_for(Instructor, 'last_name', dump_only=True)
 
 class DatasetSchema(ModelSchema):
     stub = 'need to do this'

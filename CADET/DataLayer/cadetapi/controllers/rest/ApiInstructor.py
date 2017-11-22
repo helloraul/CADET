@@ -10,12 +10,10 @@ from cadetapi.controllers.database.cadet_insert import DbInstructor
 from cadetapi.schemas import InstructorSchema
 
 class InstructorApi(Resource):
-    def get(self, instructor_id=None):
-        if instructor_id:
-            instructor = Instructor.query.get(instructor_id)
-            if not instructor:
-                abort(404)
-            return instructor
+    def get(self, instr_id=None):
+        inst = DbInstructor()
+        response = inst.Query(instr_id)
+        if instr_id is None:
+            return InstructorSchema(many=True).dump(response).data
         else:
-            instructors = Instructor.query.all()
-            return instructors
+            return InstructorSchema(many=False).dump(response).data
