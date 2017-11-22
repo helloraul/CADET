@@ -14,6 +14,6 @@ class CourseApi(Resource):
         inst = DbCourse()
         response = inst.Query(course_id)
         if course_id is None:
-            return CourseSchema().load(response)
+            return CourseSchema(many=True).dump(response).data
         else:
-            return CourseSchema(many=True).load(response)
+            return CourseSchema(many=False).dump(response).data
