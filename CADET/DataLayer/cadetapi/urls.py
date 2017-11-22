@@ -5,11 +5,11 @@
     https://flask-restful.readthedocs.io/en/latest/
 """
 from flask_restful import Api
-from .controllers.rest.Comment import CommentApi
-from .controllers.rest.Course import CourseApi
-from .controllers.rest.Instr import InstrApi
-from .controllers.rest.Dataset import DatasetApi
-from .controllers.rest.Results import ResultApi
+from .controllers.rest.ApiComment import CommentApi
+from .controllers.rest.ApiCourse import CourseApi
+from .controllers.rest.ApiInstructor import InstructorApi
+from .controllers.rest.ApiDataset import DatasetApi
+from .controllers.rest.ApiResults import ResultApi
 
 rest_api = Api()
 
@@ -31,7 +31,7 @@ rest_api.add_resource(
     )
 
 rest_api.add_resource(
-    InstrApi,                         # name of class handling requests
+    InstructorApi,                         # name of class handling requests
     '/api/Instr',                     # url to retrieve table
     '/api/Instr/<int:instr_id>/',     # url to retrieve elements in table
     endpoint='instr'                  # Flask name of API endpoint
