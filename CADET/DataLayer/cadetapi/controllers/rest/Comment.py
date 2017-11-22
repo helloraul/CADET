@@ -12,6 +12,23 @@ from cadetapi.schemas import CommentSchema
 class CommentApi(Resource):
     def get(self, comment_id=None):
         inst = DbComment()
+        response = inst.Query(comment_id)
+        if comment_id is None:
+            return CommentSchema(many=True).dump(response).data
+        else:
+            return CommentSchema(many=False).dump(response).data
+
+
+    def post(self):
+        # Receive single comment as json object (primarily for unit testing)
+        NewComment = DbComment()
+        response = {}
+        response['comment_id'] = NewComment.GetId(request.get_json())
+        return response
+
+"""
+    def get(self, comment_id=None):
+        inst = DbComment()
         if comment_id is None:
             # No ID was provided, so we'll return everything
             comments = inst.GetAll()
@@ -22,10 +39,4 @@ class CommentApi(Resource):
             if not comment:
                 abort(404)
             return CommentSchema().load(comment)
-
-    def post(self):
-        # Receive single comment as json object (primarily for unit testing)
-        NewComment = DbComment()
-        response = {}
-        response['comment_id'] = NewComment.GetId(request.get_json())
-        return response
+"""

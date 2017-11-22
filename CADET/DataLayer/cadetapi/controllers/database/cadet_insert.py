@@ -246,16 +246,22 @@ class DbComment():
         self.comment['instructor_comments'] = ''
         self.comment['additional_comments'] = ''
 
-    def GetAll(self):
-        query = self.sess.query(Comment.id)
-        result = query.all()
-        #allcomments = {}
-        allcomments = []
-        for comment_id in result:
-                #allcomments[comment_id[0]] = self.GetComment(comment_id[0])
-                allcomments.append(self.GetComment(comment_id[0]))
-            
-        return allcomments
+    def Query(self, pk=None):
+        query = self.sess.query(
+                    Comment.anon_id.label('anon_id'),
+                    Course.program.label('course_program'),
+                    Course.modality.label('course_modality'),
+                    Course.num_sec.label('course_num_sect_id'),
+                    Instructor.first_name.label('instructor_first_name'),
+                    Instructor.last_name.label('instructor_last_name'),
+                    Comment.c_com.label('course_comments'),
+                    Comment.i_com.label('instructor_comments'),
+                    Comment.a_com.label('additional_comments'),
+                ).join(Course).join(Instructor)
+        if pk is None:
+            return query.all()
+        else:
+            return query.filter(Comment.id==pk).first()
 
     def __init__(self):
         # Open session to the database

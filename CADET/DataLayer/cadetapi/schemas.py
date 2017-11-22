@@ -11,7 +11,17 @@ from .models import *
 
 ma=Marshmallow()
 
-class CommentSchema(ma.Schema):
+class CommentSchema(ModelSchema):
+    anon_id = field_for(Comment, 'anon_id', dump_only=True)
+    course_program = field_for(Course, 'program', dump_only=True)
+    course_modality = field_for(Course, 'modality', dump_only=True)
+    course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
+    instructor_first_name = field_for(Instructor, 'first_name', dump_only=True)
+    instructor_last_name = field_for(Instructor, 'last_name', dump_only=True)
+    course_comments = field_for(Comment, 'c_com', dump_only=True)
+    instructor_comments = field_for(Comment, 'i_com', dump_only=True)
+    additional_comments = field_for(Comment, 'a_com', dump_only=True)
+"""
     #comment_id = ma.fields.Integer(attribute='id')
     anon_id = ma.Integer()
     instructor_first_name = ma.String()
@@ -23,15 +33,9 @@ class CommentSchema(ma.Schema):
     instructor_comments = ma.String()
     additional_comments = ma.String()
     #additional_comment = ma.String(attribute='a_com')
+"""
 
 class CourseSchema(ModelSchema):
     course_program = field_for(Course, 'program', dump_only=True)
     course_modality = field_for(Course, 'modality', dump_only=True)
     course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
-    class Meta:
-        model = Course
-    """
-    course_program = ma.String(attribute='program')
-    course_modality = ma.String(attribute='modality')
-    course_num_sect_id = ma.String(attribute='num_sec')
-"""
