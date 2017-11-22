@@ -4,13 +4,12 @@
 """
 
 from flask import abort
-from flask_restful import Resource, marshal_with
+from flask_restful import Resource, request
 from cadetapi.models import ResultSet
-from .fields import result_fields
-
+from cadetapi.controllers.database.cadet_insert import DbResult
+from cadetapi.schemas import ResultSchema
 
 class ResultApi(Resource):
-    @marshal_with(result_fields)
     def get(self, result_id=None):
         if result_id:
             result = ResultSet.query.get(result_id)
