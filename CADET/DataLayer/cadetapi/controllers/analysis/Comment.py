@@ -21,13 +21,26 @@ class Comment(object):
     course_num_sect_id = ''
     anon_id = 0
 
+    def show(self):
+        print('Course: ' + self.course_num_sect_id)
+        print('Professor: ' + self.instructor_first_name + ' ' + self.instructor_last_name)
+        print('Comment: ' + self.comment)
+        print('Sentiment: ' + self.sentiment_classifier)
+        if self.course_comments:
+            print('Course comment: ' + self.course_comments)
+        if self.instructor_comments:
+            print('Instructor comment: ' + self.instructor_comments)
+        if self.additional_comments:
+            print('Additional comment: ' + self.additional_comments)
+ 
+
     def getSentimentClass(self):
         return self.sentiment_classifier
 
     #def getConfidence(self):
     #    return self.confidence
 
-    def getTopicmodelId(self):
+    def getTopicModelId(self):
         return self.topic_model_id
 
     def getComment(self):
@@ -39,12 +52,13 @@ class Comment(object):
     #def setConfidence(self, confidence):
     #    self.confidence = confidence
 
-    def setTopicmodelId(self, id):
+    def setTopicModelId(self, id):
         self.topic_model_id = id
 
-    def setInstructorName(self, fname, lname):
-        self.instructor_last_name = lname
-        self.instructor_first_name = fname
+    def setInstructorName(self, name):
+        full_name = name.split(' ')
+        self.instructor_last_name = full_name[1]
+        self.instructor_first_name = full_name[0]
 
     def getInstructorName(self):
         return (self.instructor_last_name, self.instructor_first_name)
