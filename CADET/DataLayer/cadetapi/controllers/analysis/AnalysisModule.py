@@ -32,7 +32,7 @@ class AnalysisModule():
 	stop_words = set(stopwords.words('english'))
 	stop_words.update(['.', ',', '"', "'", '?', '!', ':', ';', '(', ')', '[', ']', '{', '}']) # remove if you need punctuation
 	stop_words.update(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','u','x','y','z','0','1','2','3','4','5','6','7','8','9'])
-	with open("../resources/stop_words.txt") as f:        #get stop_words from file 
+	with open("stop_words.txt") as f:        #get stop_words from file 
 	    file_stop_words = [line.rstrip('\n') for line in f ]
 	stop_words.update(file_stop_words)
 	
@@ -168,10 +168,10 @@ class AnalysisModule():
 					topic_id = i 
 
 					
-			self.commentList[indexer].setTopicModleId(topic_id)
+			self.commentList[indexer].setTopicModelId(topic_id)
 
 			
-			topic_id = self.commentList[indexer].getTopicModleId()
+			topic_id = self.commentList[indexer].getTopicModelId()
 			sentiment_class = self.commentList[indexer].getSentimentClass()
 			if(sentiment_class == 'positive'):
 				self.topic_sentiment_histogram.get(topic_id)[0] = self.topic_sentiment_histogram.get(topic_id)[0]+1
