@@ -20,6 +20,7 @@ class Comment(object):
     course_modality = 0
     course_num_sect_id = ''
     anon_id = 0
+    comment_id = 0
 
     def show(self):
         print('Course: ' + self.course_num_sect_id)
@@ -32,6 +33,7 @@ class Comment(object):
             print('Instructor comment: ' + self.instructor_comments)
         if self.additional_comments:
             print('Additional comment: ' + self.additional_comments)
+        print('Comment ID: ' + str(self.comment_id))
  
 
     def getSentimentClass(self):

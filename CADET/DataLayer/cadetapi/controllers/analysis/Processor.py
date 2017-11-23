@@ -21,16 +21,16 @@ class Processor():
         self.comment_list = comment_list
         # add all comments to a single string
         for comment_object in comment_list:
-            self.comments.append(comment_object.comment)
+            self.comments.append([comment_object.comment, comment_object.comment_id])
             self.text += comment_object.comment
             self.text += ' '
             if comment_object.instructor_comments:
                 name = comment_object.instructor_first_name + ' ' + comment_object.instructor_last_name
                 if name in self.instructor_comments:
-                    self.instructor_comments.get(name).append(comment_object.instructor_comments)
+                    self.instructor_comments.get(name).append([comment_object.instructor_comments, comment_object.comment_id])
                 else:
                     self.instructor_comments[name] = []
-                    self.instructor_comments.get(name).append(comment_object.instructor_comments)
+                    self.instructor_comments.get(name).append([comment_object.instructor_comments, comment_object.comment_id])
 
     def process(self):
 
