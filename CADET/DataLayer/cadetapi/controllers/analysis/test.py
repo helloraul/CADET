@@ -4,18 +4,12 @@ from Comment import Comment as CommentObject
 def create_comment_object(num, text):
     comment = CommentObject()
     comment.comment = text 
-    comment.sentiment_classifier = ''
-    comment.topic_model_id = 0
-    comment.course_comments = 'lame'
-    comment.instructor_comments = text 
-    comment.additional_comments = ''
     comment.instructor_last_name = 'Who'
     comment.instructor_first_name = 'Cares'
     comment.course_program = ''
-    comment.course_modality = 0
-    comment.course_num_sect_id = '123.45.6'
     comment.anon_id = 2
     comment.comment_id = num
+    comment.comment_type = 'Course'
     return comment
 
 if __name__ == "__main__":
@@ -40,7 +34,7 @@ if __name__ == "__main__":
     for comment in processor.instructorCommentList:
         comment.show()
         print('')
-    for comment in processor.commentList:
+    for comment in processor.courseCommentList:
         comment.show()
         print('')
     print(processor.topic_sentiment_histogram)
