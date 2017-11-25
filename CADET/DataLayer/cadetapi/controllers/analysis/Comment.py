@@ -27,6 +27,17 @@ class Comment():
         print('Comment: ' + self.comment)
         print('Sentiment: ' + self.sentiment)
         print('Comment ID: ' + str(self.comment_id))
+
+    def convertCommentDict(self, comment_dict):
+        self.anon_id = comment_dict['anon_id']
+        self.comment = comment_dict['comment']
+        self.comment_id = comment_dict['comment_id']
+        self.comment_type = comment_dict['comment_type']
+        self.course = comment_dict['course']
+        self.instructor_first_name = comment_dict['instructor_first_name']
+        self.instructor_last_name = comment_dict['instructor_last_name']
+        self.sentiment = comment_dict['sentiment']
+        self.topic_model_id = comment_dict['topic_model_id']
         
     def getSentiment(self):
         return self.sentiment
@@ -60,9 +71,12 @@ class Comment():
     def getCourse(self):
         return (self.course_program, self.course_modality, self.course_num_sect_id)
 
-    def __init__(self, comment = ' ', comment_type = ' ', comment_id = 0):
+    def __init__(self, comment_dict = None, comment = ' ', comment_type = ' ', comment_id = 0):
 
-        self.comment = comment
-        self.comment_type = comment_type
-        self.comment_id = comment_id
+        if comment_dict is None:
+            self.comment = comment
+            self.comment_type = comment_type
+            self.comment_id = comment_id
+        else:
+            self.convertCommentDict(comment_dict)
 
