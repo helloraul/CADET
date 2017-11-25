@@ -1,5 +1,5 @@
-from AnalysisModule import AnalysisModule as Analyzer
-from Comment import Comment as CommentObject
+from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
+from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 
 class Processor():
 
@@ -31,4 +31,19 @@ class Processor():
         self.instructor_sentiment_histogram = self.Analyzer.getInstructorSentimentHistogram()
         self.instructorCommentList = self.Analyzer.getInstructorComments()
         self.hasFinishedLoad = True
+
+    def getCourseCommentList(self):
+        return self.courseCommentList
+
+    def getInstructorCommentList(self):
+        return self.instructorCommentList
+
+    def getInstructorSentimentHistogram(self):
+        return self.instructor_sentiment_histogram
+
+    def getTopicModel(self):
+        return self.topic_model
+
+    def getTopicSentimentHistogram(self):
+        return self.topic_sentiment_histogram
 

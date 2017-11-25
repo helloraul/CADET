@@ -1,11 +1,11 @@
-from Comment import Comment
+from cadetapi.controllers.analysis.Comment import Comment
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from stop_words import get_stop_words
 from gensim import corpora, models
 import gensim
 import requests
-import SentimentModule_twinward_api as sentimentAnalyzer
+import cadetapi.controllers.analysis.SentimentModule_twinward_api as sentimentAnalyzer
 
 #import SentimentModule as sentimentAnalyzer
 import multiprocessing
@@ -186,7 +186,7 @@ class AnalysisModule():
 
     def separateCommentTypes(self):
         for comment_object in self.comment_objects:
-            if comment_object.comment_type == 'Instructor':
+            if comment_object.comment_type == 'instructor':
                 self.instructorCommentList.append(comment_object)
                 
                 # create a dictionary mapping comments to their intended instructor
@@ -200,7 +200,7 @@ class AnalysisModule():
                     self.instructor_comments_dict[name] = []
                     self.instructor_comments_dict.get(name).append(comment_dict)
 
-            elif comment_object.comment_type == 'Course':
+            elif comment_object.comment_type == 'course':
                 self.courseCommentList.append(comment_object)
             self.text += comment_object.comment
             self.text += ' '
