@@ -11,6 +11,24 @@ from cadetapi.schemas import DatasetSchema
 
 class DatasetApi(Resource):
     def get(self, dataset_id=None):
+        # Retrieve datasets from database
+        inst = DbDataset()
+        response = inst.Query(dataset_id)
+
+        # marshall dataset(s) into dict
+        if dataset_id is None:
+            result = DatasetSchema(many=True).dump(response).data
+        else:
+            result = DatasetSchema(many=False).dump(response).data
+
+        # return result dict and 204 code if empty
+        if (result):
+            return result
+        else:
+            return result, 204
+
+"""
+    def get(self, dataset_id=None):
         if dataset_id:
             dataset = DataSet.query.get(dataset_id)
             if not dataset:
@@ -19,3 +37,4 @@ class DatasetApi(Resource):
         else:
             datasets = DataSet.query.all()
             return datasets
+"""

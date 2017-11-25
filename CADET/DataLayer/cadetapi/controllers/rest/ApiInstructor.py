@@ -11,9 +11,19 @@ from cadetapi.schemas import InstructorSchema
 
 class InstructorApi(Resource):
     def get(self, instr_id=None):
+        # Retrieve instructors from database
         inst = DbInstructor()
         response = inst.Query(instr_id)
+
+        # marshall instructor(s) into dict
         if instr_id is None:
-            return InstructorSchema(many=True).dump(response).data
+            result = InstructorSchema(many=True).dump(response).data
         else:
-            return InstructorSchema(many=False).dump(response).data
+            result = InstructorSchema(many=False).dump(response).data
+
+        # return result dict and 204 code if empty
+        if (result):
+            return result
+        else:
+            return result, 204
+

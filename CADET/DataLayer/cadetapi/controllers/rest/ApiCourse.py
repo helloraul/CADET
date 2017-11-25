@@ -11,9 +11,19 @@ from cadetapi.schemas import CourseSchema
 
 class CourseApi(Resource):
     def get(self, course_id=None):
+        # Retrieve courses from database
         inst = DbCourse()
         response = inst.Query(course_id)
+
+        # marshall course(s) into dict
         if course_id is None:
-            return CourseSchema(many=True).dump(response).data
+            result = CourseSchema(many=True).dump(response).data
         else:
-            return CourseSchema(many=False).dump(response).data
+            result = CourseSchema(many=False).dump(response).data
+
+        # return result dict and 204 code if empty
+        if (result):
+            return result
+        else:
+            return result, 204
+

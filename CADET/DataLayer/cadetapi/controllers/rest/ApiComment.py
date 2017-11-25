@@ -11,12 +11,21 @@ from cadetapi.schemas import CommentSchema
 
 class CommentApi(Resource):
     def get(self, comment_id=None):
+        # Retrieve comments from database
         inst = DbComment()
         response = inst.Query(comment_id)
+
+        # marshall comment(s) into dict
         if comment_id is None:
-            return CommentSchema(many=True).dump(response).data
+            result = CommentSchema(many=True).dump(response).data
         else:
-            return CommentSchema(many=False).dump(response).data
+            result = CommentSchema(many=False).dump(response).data
+
+        # return result dict and 204 code if empty
+        if (result):
+            return result
+        else:
+            return result, 204
 
 
     def post(self):

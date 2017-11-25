@@ -11,6 +11,24 @@ from cadetapi.schemas import ResultSchema
 
 class ResultApi(Resource):
     def get(self, result_id=None):
+        # Retrieve results from database
+        inst = DbResult()
+        response = inst.Query(result_id)
+
+        # marshall result(s) into dict
+        if result_id is None:
+            result = ResultSchema(many=True).dump(response).data
+        else:
+            result = ResultSchema(many=False).dump(response).data
+
+        # return result dict and 204 code if empty
+        if (result):
+            return result
+        else:
+            return result, 204
+
+"""
+    def get(self, result_id=None):
         if result_id:
             result = ResultSet.query.get(result_id)
             if not result:
@@ -19,3 +37,4 @@ class ResultApi(Resource):
         else:
             results = ResultSet.query.all()
             return results
+"""
