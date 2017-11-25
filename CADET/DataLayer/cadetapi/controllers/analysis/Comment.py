@@ -38,6 +38,19 @@ class Comment():
         self.instructor_last_name = comment_dict['instructor_last_name']
         self.sentiment = comment_dict['sentiment']
         self.topic_model_id = comment_dict['topic_model_id']
+
+    def convertToCommentDict(self):
+        return {
+                    'anon_id':self.anon_id,
+                    'comment':self.comment,
+                    'comment_id':self.comment_id,
+                    'comment_type':self.comment_type,
+                    'course':self.course,
+                    'instructor_first_name':self.instructor_first_name,
+                    'instructor_last_name':self.instructor_last_name,
+                    'sentiment':self.sentiment,
+                    'topic_model_id':self.topic_model_id
+                }
         
     def getSentiment(self):
         return self.sentiment
