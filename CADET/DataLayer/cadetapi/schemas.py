@@ -34,30 +34,20 @@ class InstructorSchema(ModelSchema):
 class DatasetSchema(ModelSchema):
     stub = 'need to do this'
 
-#class ResultSchema(ModelSchema):
-#    stub = 'need to do this'
-
-class MetaSchema(Schema):
+class MetaSchema(ModelSchema):
     doc_id = ma.Integer()
     topics = ma.Integer()
     iterations = ma.Integer()
     words_per_topic = ma.Integer()
 
-class TopicsSchema(Schema):
+class TopicSchema(ModelSchema):
     topic_id = ma.Integer()
     topic_words = ma.List(ma.String())
     positive = ma.List(ma.String())
     neutral  = ma.List(ma.String())
     negative = ma.List(ma.String())
 
-    @post_dump(raw=True)
-    def wrap_if_many(self, data, many=False):
-        if many:
-            return {'Topics': data}
-        return data
-
-
-class RatingsSchema(Schema):
+class RatingSchema(ModelSchema):
     course_sect = ma.String()
     instr_first = ma.String()
     instr_last  = ma.String()
@@ -65,13 +55,7 @@ class RatingsSchema(Schema):
     neutral  = ma.List(ma.String())
     negative = ma.List(ma.String())
 
-    @post_dump(raw=True)
-    def wrap_if_many(self, data, many=False):
-        if many:
-            return {'Ratings': data}
-        return data
-
-class ResultsSchema(Schema):
+class ResultSchema(ModelSchema):
     meta = ma.Nested(MetaSchema)
-    topic_stats = ma.Nested(TopicsSchema(many=True))
+    topic_stats = ma.Nested(TopicSchema(many=True))
     instructor_stats = ma.Nested(RatingSchema(many=True))
