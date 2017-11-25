@@ -14,14 +14,16 @@ class Comment():
     comment = ''
     comment_id = 0
     comment_type = ''
-    course = ''
+    course_num_sect_id = ''
     instructor_first_name = ''
     instructor_last_name = ''
     sentiment = ''
     topic_model_id = 0
+    course_modality = ''
+
 
     def show(self):
-        print('Course: ' + self.course)
+        print('Course: ' + self.course_num_sect_id)
         print('Instructor: ' + self.instructor_first_name + ' ' + self.instructor_last_name)
         print('Comment type: ' + self.comment_type)
         print('Comment: ' + self.comment)
@@ -33,11 +35,12 @@ class Comment():
         self.comment = comment_dict['comment']
         self.comment_id = comment_dict['comment_id']
         self.comment_type = comment_dict['comment_type']
-        self.course = comment_dict['course']
+        self.course_num_sect_id = comment_dict['course_num_sect_id']
         self.instructor_first_name = comment_dict['instructor_first_name']
         self.instructor_last_name = comment_dict['instructor_last_name']
         self.sentiment = comment_dict['sentiment']
         self.topic_model_id = comment_dict['topic_model_id']
+        self.modality = comment_dict['course_modality']
 
     def convertToCommentDict(self):
         return {
@@ -45,11 +48,12 @@ class Comment():
                     'comment':self.comment,
                     'comment_id':self.comment_id,
                     'comment_type':self.comment_type,
-                    'course':self.course,
+                    'course_num_sect_id':self.course_num_sect_id,
                     'instructor_first_name':self.instructor_first_name,
                     'instructor_last_name':self.instructor_last_name,
                     'sentiment':self.sentiment,
-                    'topic_model_id':self.topic_model_id
+                    'topic_model_id':self.topic_model_id,
+                    'course_modality':self.modality
                 }
         
     def getSentiment(self):
@@ -77,12 +81,17 @@ class Comment():
         self.instructor_first_name = first_name
         self.instructor_last_name - last_name
 
-
-    def setCourse(self, program, modality, num_sec):
-        return course
+    def setCourse(self, course_num_sect_id):
+        self.course_num_sect_id = course_num_sect_id
 
     def getCourse(self):
-        return (self.course_program, self.course_modality, self.course_num_sect_id)
+        return self.course_num_sect_id
+
+    def setModality(self, modality):
+        self.modality = modality
+
+    def getModality(self):
+        return self.modality
 
     def __init__(self, comment_dict = None, comment = ' ', comment_type = ' ', comment_id = 0):
 
