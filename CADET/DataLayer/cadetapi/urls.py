@@ -18,35 +18,44 @@ rest_api.add_resource(
     CommentApi,                       # name of class handling requests
     '/api/Comment',                   # url to retrieve table
     '/api/Comment/<int:comment_id>',  # url to retrieve elements in table
-    '/api/Comment/',                  # alternative url to retrieve table
-    '/api/Comment/<int:comment_id>/', # alternative url to retrieve elements in table
+    '/api/Comment/',                  # alt url to retrieve table
+    '/api/Comment/<int:comment_id>/', # alt url to retrieve elements in table
     endpoint='comment'                # Flask name of API endpoint
     )
 
 rest_api.add_resource(
     CourseApi,                        # name of class handling requests
     '/api/Course',                    # url to retrieve table
-    '/api/Course/<int:course_id>/',   # url to retrieve elements in table
+    '/api/Course/<int:course_id>',    # url to retrieve elements in table
+    '/api/Course/',                   # alt url to retrieve table
+    '/api/Course/<int:course_id>/',   # alt url to retrieve elements in table
     endpoint='course'                 # Flask name of API endpoint
     )
 
 rest_api.add_resource(
     InstructorApi,                    # name of class handling requests
     '/api/Instructor',                # url to retrieve table
-    '/api/Instructor/<int:instr_id>/',# url to retrieve elements in table
+    '/api/Instructor/<int:instr_id>' ,# url to retrieve elements in table
+    '/api/Instructor/',               # alt url to retrieve table
+    '/api/Instructor/<int:instr_id>/',# alt url to retrieve elements in table
     endpoint='instr'                  # Flask name of API endpoint
     )
 
 rest_api.add_resource(
     DatasetApi,                       # name of class handling requests
     '/api/Dataset',                   # url to retrieve table
-    '/api/Dataset/<int:dataset_id>/', # url to retrieve elements in table
+    '/api/Dataset/<int:dataset_id>',  # url to retrieve elements in table
+    '/api/Dataset/',                  # alt url to retrieve table
+    '/api/Dataset/<int:dataset_id>/', # alt url to retrieve elements in table
     endpoint='dataset'                # Flask name of API endpoint
     )
 
 rest_api.add_resource(
     ResultApi,                        # name of class handling requests
     '/api/Result',                    # url to retrieve table
-    '/api/Result/<int:result_id>/',   # url to retrieve elements in table
+    '/api/Result/<int:result_id>',    # url to retrieve elements in table
+    '/api/Result/',                   # alt url to retrieve table
+    '/api/Result/<int:result_id>/',   # alt url to retrieve elements in table
     endpoint='result'                 # Flask name of API endpoint
     )
+
