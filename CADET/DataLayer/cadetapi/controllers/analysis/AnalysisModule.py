@@ -1,4 +1,5 @@
 from cadetapi.controllers.analysis.Comment import Comment
+from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from stop_words import get_stop_words
@@ -33,10 +34,8 @@ class AnalysisModule():
     stop_words.update(['.', ',', '"', "'", '?', '!', ':', ';', '(', ')', '[', ']', '{', '}']) # remove if you need punctuation
     stop_words.update(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','u','x','y','z','0','1','2','3','4','5','6','7','8','9'])
     
-    # get stop_words from file 
-    with open("stop_words.txt") as f:  
-        file_stop_words = [line.rstrip('\n') for line in f ]
-    stop_words.update(file_stop_words)
+    # get stop_words from database
+    stop_words.update(StopwordApi().get())
 
     comment_objects = []
     text = ''
