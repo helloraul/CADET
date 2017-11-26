@@ -14,11 +14,11 @@ from multiprocessing import Process, Pipe, freeze_support
 """
 AnalysisModule: for updating & processing student comments. We process the following data results:
 
-1. 
-2. topic_sentiment_histogram -> dictionary{topic_id, list(num_pos_comments, num_neg_comments, num_neu_comments)}
-3. instructor_sentiment_histogram -> dictionary{instructor_name, list(num__pos_comments, num_neg_comments, num_neu_comments)}
-4. instructorCommentList -> updated list of Comment objs for each instructor -with sentiment, topic_id, instructorName 
-5. commentList -> updated list of Comment objs for the course- with sentiment & topic_id
+1. courseCommentList -> updated list of comment objects for the course with sentiment and topic_id
+2. topic_model -> dictionary <topic_id, list_of_words_in_that_topic>
+3. topic_sentiment_histogram -> dictionary{topic_id, list(num_pos_comments, num_neg_comments, num_neu_comments)}
+4. instructor_sentiment_histogram -> dictionary{instructor_name, list(num__pos_comments, num_neg_comments, num_neu_comments)}
+5. instructorCommentList -> updated list of Comment objs for each instructor with sentiment and topic_id
 
 All results are procesed from the 'runAnalysis()' method which will execute processes in paralel 
 
@@ -32,7 +32,9 @@ class AnalysisModule():
     stop_words = set(stopwords.words('english'))
     stop_words.update(['.', ',', '"', "'", '?', '!', ':', ';', '(', ')', '[', ']', '{', '}']) # remove if you need punctuation
     stop_words.update(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','u','x','y','z','0','1','2','3','4','5','6','7','8','9'])
-    with open("stop_words.txt") as f:        #get stop_words from file 
+    
+    # get stop_words from file 
+    with open("stop_words.txt") as f:  
         file_stop_words = [line.rstrip('\n') for line in f ]
     stop_words.update(file_stop_words)
 
@@ -51,32 +53,42 @@ class AnalysisModule():
     words_per_topic = 6
     iterations = 30
 
-#runAnalysis:
-#   init processes for computing topic model and getting sentiment      
+    """
+    Compute the topic model and get sentiments for each comments
+
+    Two separate threads are used to process the sentiment for the course
+    comments and the instructor comments.
+
+    The threads are joined in 'updateAttributes'.
+    """
     def runAnalysis(self):
         
-        self.qList, childPipe = Pipe()
-        
-        self.instructorListPipe, commentPipe= Pipe()  
-        ctx1 = multiprocessing.get_context('spawn')
-        ctx2 = multiprocessing.get_context('spawn')
-        self.sentiment_process = ctx1.Process(target=self.processSentiment, 
-                                        args=(childPipe, self.courseCommentList))
-        self.sentiment_process.daemon=True
+        freeze_support() # needed to run on Windows
 
-        self.sentiment_process.start()
-        
-        if self.instructorCommentList is not None: # if data is available
-            self.instructor_process = ctx2.Process(target=self.processInstructorComments,
-                                        args=(commentPipe, self.instructorCommentList))
+        # create separate thread for analyzing course comments
+        if self.courseCommentList is not None:
+            self.qList, childPipe = Pipe()
+            ctx1 = multiprocessing.get_context('spawn')
+            self.sentiment_process = ctx1.Process(target=self.processSentiment, args=(childPipe, self.courseCommentList))
+            self.sentiment_process.daemon=True
+            self.sentiment_process.start()
+       
+        # create separate thread for analyzing instructor comments
+        if self.instructorCommentList is not None: 
+            self.instructorListPipe, commentPipe= Pipe()  
+            ctx2 = multiprocessing.get_context('spawn')
+            self.instructor_process = ctx2.Process(target=self.processInstructorComments, args=(commentPipe, self.instructorCommentList))
             self.instructor_process.start()
         
-        freeze_support()
         
-        self.processLDAModel()  #get LDA topic model obj 
+        self.processLDAModel()  
         self.updateAttributes()
-        self.processTopicSentimentHistogram()  # process the topic_sentiment_histogram
+        self.processTopicSentimentHistogram()
 
+    """
+    Receive sentiment of comments from the separate threads.
+    Terminate the separate processes.
+    """
     def updateAttributes(self):
         course_sentiments = self.qList.recv()
         for comment_object in self.courseCommentList:
@@ -84,6 +96,9 @@ class AnalysisModule():
         self.sentiment_process.join()
         self.sentiment_process.terminate()
 
+        # data is a list containing:
+        # [0]: a dictionary mapping the comment's sentiment to its comment_id 
+        # [1]: the instructor sentiment histogram
         data = self.instructorListPipe.recv()
         instructor_sentiments = data[0]
         self.instructor_sentiment_histogram = data[1]
@@ -92,8 +107,9 @@ class AnalysisModule():
         self.instructor_process.join()
         self.instructor_process.terminate()
 
-#       ProcessTopicModel 
-#               Here we clean the text and compute for the LDA model    
+    """
+    Clean the text and compute the LDA model (topic model)
+    """
     def processLDAModel(self):
     
         print("Generating Topic Model ... ")            
@@ -113,7 +129,7 @@ class AnalysisModule():
             texts.append(cleaned_tokens)
 
         # turn our tokenized documents into a id <-> term dictionary
-        dictionary = corpora.Dictionary(texts)#assign a unique integer id to each token (also does word count)
+        dictionary = corpora.Dictionary(texts) # assign a unique integer id to each token (also does word count)
 
         # convert tokenized documents into a document-term matrix
         corpus = [dictionary.doc2bow(text) for text in texts if text]
@@ -121,69 +137,83 @@ class AnalysisModule():
         self.ldamodel = gensim.models.ldamodel.LdaModel(corpus, self.num_topics,
                         id2word = dictionary, passes=self.iterations)
         print("...Finished Topic Model")
-        
-        
 
+    """
+    Create a histogram showing the sentiments of the comments in each topic.
+    { topic_id: [num_positive, num_negative, num_neutral] ... }
+    """
     def processTopicSentimentHistogram(self):
 
         topic_dictionary = {}  # <topic_id, list_of_words_in_that_topic>
-        
-        for topic_id in range(0, self.num_topics):   # initialize topic_sentiment_histogram
+
+        # initialize topic_sentiment_histogram
+        for topic_id in range(0, self.num_topics):   
             self.topic_sentiment_histogram[topic_id] = [0,0,0]
-            topic_dictionary[topic_id] = list(dict(self.ldamodel.show_topic(topic_id,
-                                            self.words_per_topic)).keys())
+            topic_dictionary[topic_id] = list(dict(self.ldamodel.show_topic(topic_id, self.words_per_topic)).keys())
             print(topic_dictionary.get(topic_id))
                         
         self.topic_sentiment_histogram[-1] = [0,0,0] 
         indexer = 0 
-        ###########---now we compute a sentiment histogram for each topic---############
 
-        #for each comment, which topic shares the greatest # of words in commen 
-        for comment_object in self.courseCommentList: # asign topic id number to a comment
+        # find which topic shares the greatest # of words in comment 
+        # asign topic id number to a comment
+        for comment_object in self.courseCommentList: 
             comment = comment_object.comment
             count_similarities = -1
             topic_id = -1
             
-            for i in range(0, self.num_topics):  # for each topic 
+            for i in range(0, self.num_topics): # for each topic 
                 topic_words = topic_dictionary.get(i) # get the list of words from each topic_id
-
                 temp_count = -1
-                for word in topic_words:  #for each word in each topic 
+
+                # count the number of times a topic word appears in the comment
+                for word in topic_words: 
                     temp_count += comment.lower().count(word) 
                  
+
+                # find which topic shares the greatest # of words in comment 
                 if temp_count > count_similarities:
                     count_similarities = temp_count
                     topic_id = i 
-
                             
             self.courseCommentList[indexer].setTopicModelId(topic_id)
-            
-            topic_id = self.courseCommentList[indexer].getTopicModelId()
-            sentiment_class = comment_object.getSentiment()
-            if(sentiment_class == 'positive'):
+
+            sentiment = comment_object.getSentiment()
+            if(sentiment == 'positive'):
                 self.topic_sentiment_histogram.get(topic_id)[0] += 1 
-            elif(sentiment_class == 'negative'):
+            elif(sentiment == 'negative'):
                 self.topic_sentiment_histogram.get(topic_id)[1] += 1
             else: # neutral
                 self.topic_sentiment_histogram.get(topic_id)[2] += 1
             indexer += 1
-        self.topic_model = topic_dictionary
-            
- 
 
+        self.topic_model = topic_dictionary
+
+    """
+    Process the sentiment of each course comment.
+
+    courseCommentList is passed as an argument so the function 
+    has access to it in the separate thread
+    """
     def processSentiment(self, conn, courseCommentList): 
        
-        print("Processing overall comments ...")
+        print("Processing course comments ...")
         sentiment_dict = {}
 
         for comment_object in courseCommentList:
             sentiment = sentimentAnalyzer.sentiment(comment_object.comment)
             sentiment_dict[comment_object.comment_id] = sentiment
 
-        conn.send(sentiment_dict)        
+        conn.send(sentiment_dict) 
         conn.close()
-        print("Finish: processing overall comments...")
+        print("Finish: processing course comments...")
 
+    """
+    Separate the course comments from the instructor comments and combines course
+    comments to a single string (to be used for generating the topic model).
+
+    Course comments and instructor comments go through different processes.
+    """
     def separateCommentTypes(self):
         for comment_object in self.comment_objects:
             if comment_object.comment_type == 'instructor':
@@ -202,25 +232,38 @@ class AnalysisModule():
 
             elif comment_object.comment_type == 'course':
                 self.courseCommentList.append(comment_object)
-            self.text += comment_object.comment
-            self.text += ' '
 
+                # combine all comments as a single string (to be used for generating the topic model)
+                self.text += comment_object.comment
+                self.text += ' '
+
+    """
+    Process the sentiment of each instructor comment.
+
+    Create the instructor_sentiment_histogram
+
+    instructorCommentList is passed as an argument so the function 
+    has access to it in the separate thread
+    """
     def processInstructorComments(self, conn, instructorCommentList):
 
         print("Processing Instructor Comments")
         instructor_sentiment_histogram = {} 
         sentiment_dict = {}
+
         for comment_object in instructorCommentList:
             sentiment = sentimentAnalyzer.sentiment(comment_object.comment)
             sentiment_dict[comment_object.comment_id] = sentiment
             name = comment_object.instructor_first_name + ' ' + comment_object.instructor_last_name
+            
             if name not in instructor_sentiment_histogram:
-               instructor_sentiment_histogram[name] = [0]*3
+               instructor_sentiment_histogram[name] = [0]*3 # initialize the histogram for this instructor (array of 3 items)
+
             if sentiment == 'positive':
                 instructor_sentiment_histogram.get(name)[0] += 1
             elif sentiment == 'negative':
                 instructor_sentiment_histogram.get(name)[1] += 1
-            else:
+            else: # neutral
                 instructor_sentiment_histogram.get(name)[2] += 1
             
         data = []
@@ -248,11 +291,13 @@ class AnalysisModule():
     def __init__(self, comments, num_topics=5, words_per_topic=6, iterations=30):
     
         #instructor_comments -> dictionary { instructorName, list(comments_about_instructor) }
-        #comments -> list of comment-objs about the overall course (not about instructors)
+        #comments -> list of comment-objs 
         
         self.comment_objects = comments 
         self.num_topics = num_topics
         self.words_per_topic = words_per_topic
         self.iterations = iterations
+
+        #separate the comment_objects into lists of instructor and course comments
         self.separateCommentTypes() 
 
