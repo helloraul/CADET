@@ -11,22 +11,24 @@ from .models import db
 from .schemas import ma
 from .urls import rest_api
 
+def create_app():
+    # create app using a config
+    app = Flask(__name__)
+    app.config.from_object(DevConfig)
+    #app.config.from_object(MysqlConfig)
 
-# create app using a config
-app = Flask(__name__)
-app.config.from_object(DevConfig)
-#app.config.from_object(MysqlConfig)
+    # link sqlalchemy db to the app
+    db.init_app(app)
+    ma.init_app(app)
 
-# link sqlalchemy db to the app
-db.init_app(app)
-ma.init_app(app)
+    #initialize the database if necessary
+    app.app_context().push()
+    db.create_all()
 
-#initialize the database if necessary
-app.app_context().push()
-db.create_all()
+    # link restful api to the app
+    rest_api.init_app(app)
 
-# link restful api to the app
-rest_api.init_app(app)
+    return app
 
 # Test route: currently no need for it. consider for future deletion
 @app.route('/hello')
@@ -35,4 +37,5 @@ def index():
     return "Hello, World"
 
 if __name__ == "__main__":
+    app = create_app()
     app.run()
