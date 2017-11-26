@@ -31,6 +31,10 @@ class InstructorSchema(ModelSchema):
     instructor_first_name = field_for(Instructor, 'first_name', dump_only=True)
     instructor_last_name = field_for(Instructor, 'last_name', dump_only=True)
 
+class StopwordSchema(ModelSchema):
+    word_id = field_for(Stopword, 'id', dump_only=True)
+    stop_word = field_for(Stopword, 'stop_word', dump_only=True)
+
 class DatasetSchema(ModelSchema):
     stub = 'need to do this'
 

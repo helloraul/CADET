@@ -363,12 +363,12 @@ class DbDataset():
         self.sess = DbSession()
         self.comment = DbComment()
 
-class DbStopWord():
+class DbStopword():
     word_list = []
     word_string = ''
 
     def FullList(self):
-        query = self.sess.query(StopWord.stop_word)
+        query = self.sess.query(Stopword.stop_word)
         result = query.all()
         if not result:
             # Primary Key not found in database
@@ -382,6 +382,33 @@ class DbStopWord():
                 self.word_list.append(word[0])
             self.word_string = ' '.join(word_list)
             return self.word_string
+
+    def InsertWord(self, word):
+        for w in word:
+            # If there is an existing word, check for that
+            result = self.sess.query(Stopword).filter(db.and_(
+                Stopword.stop_word == w,
+                )).first()
+
+            if result is None:
+                # Insert new word into the stop_words table
+                new_record = Stopword(
+                    stop_word = w,
+                    )
+                self.sess.add(new_record)
+                #self.sess.flush()
+
+        self.sess.commit()
+        
+        # Return all stopwords
+        return self.Query()
+
+    def Query(self, pk=None):
+        query = self.sess.query(Stopword)
+        if pk is None:
+            return query.order_by(Stopword.stop_word).all()
+        else:
+            return query.filter(Stopword.id==pk).first()
 
     def __init__(self):
         self.sess = DbSession()
@@ -407,7 +434,7 @@ class DbResult():
         # if result doesn't exist, return the primary key
         dataset = DbDataset()
         dsid = dataset.GetId(comments)
-        sw = DbStopWord()
+        sw = DbStopword()
         swl = sw.FullList()
         
         # If there is an existing dataset, check for that

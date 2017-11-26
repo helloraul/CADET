@@ -46,7 +46,7 @@ class Comment(Base):
     course = db.relationship(Course)
     instructor = db.relationship(Instructor)
 
-class StopWord(Base):
+class Stopword(Base):
     # Define columns for the 'stop_words' table
     __tablename__ = 'stop_words'
     id = db.Column(db.Integer, primary_key=True)

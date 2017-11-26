@@ -10,6 +10,7 @@ from .controllers.rest.ApiCourse import CourseApi
 from .controllers.rest.ApiInstructor import InstructorApi
 from .controllers.rest.ApiDataset import DatasetApi
 from .controllers.rest.ApiResults import ResultApi
+from .controllers.rest.ApiStopword import StopwordApi
 
 rest_api = Api()
 
@@ -59,3 +60,9 @@ rest_api.add_resource(
     endpoint='result'                 # Flask name of API endpoint
     )
 
+rest_api.add_resource(
+    StopwordApi,                      # name of class handling requests
+    '/api/Stopword',                  # url to retrieve table
+    '/api/Stopword/<int:word_id>/',   # url to retrieve elements in table
+    endpoint='stopword'                 # Flask name of API endpoint
+    )
