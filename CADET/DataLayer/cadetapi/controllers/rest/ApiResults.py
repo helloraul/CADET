@@ -6,7 +6,7 @@
 from flask import abort
 from flask_restful import Resource, request
 from cadetapi.models import ResultSet
-from cadetapi.controllers.database.cadet_insert import DbResult
+from cadetapi.controllers.database.DbControl import DbResult
 from cadetapi.schemas import ResultSchema
 
 class ResultApi(Resource):

@@ -3,7 +3,7 @@ import sys
 sys.path.append('cadetapi/')
 sys.path.append('cadetapi/controllers/database/')
 
-from cadet_insert import *
+from DbControl import *
 
 # set up a list of comments
 CommentList = []
