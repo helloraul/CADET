@@ -55,6 +55,9 @@ class AnalysisModule():
     """
     def runAnalysis(self):
         
+        # separate the comment_objects into lists of instructor and course comments
+        self.separateCommentTypes() 
+        
         freeze_support() # needed to run on Windows
 
         # create separate thread for analyzing course comments
@@ -280,7 +283,7 @@ class AnalysisModule():
     def getTopicModel(self):
             return self.topic_model
 
-    def __init__(self, comments, stop_words, num_topics=5, words_per_topic=6, iterations=30):
+    def __init__(self, comments = [], stop_words = [], num_topics=5, words_per_topic=6, iterations=30):
     
         #instructor_comments -> dictionary { instructorName, list(comments_about_instructor) }
         #comments -> list of comment-objs 
@@ -296,6 +299,4 @@ class AnalysisModule():
         self.stop_words.update(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','u','x','y','z','0','1','2','3','4','5','6','7','8','9'])
         self.stop_words.update(stop_words)
 
-        #separate the comment_objects into lists of instructor and course comments
-        self.separateCommentTypes() 
 
