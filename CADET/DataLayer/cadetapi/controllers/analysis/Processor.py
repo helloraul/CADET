@@ -1,4 +1,5 @@
 from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
+from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 
 class Processor():
@@ -20,7 +21,9 @@ class Processor():
 
     def process(self):
 
-        self.Analyzer = Analyzer(self.comment_list, self.num_topics, self.words_per_topic, self.iterations)
+        # get stop words from database
+        stop_words = StopwordApi().get()
+        self.Analyzer = Analyzer(self.comment_list, stop_words, self.num_topics, self.words_per_topic, self.iterations)
 
         self.Analyzer.runAnalysis() # This will take time !!!!
                                   # Once complete, we can get data 
