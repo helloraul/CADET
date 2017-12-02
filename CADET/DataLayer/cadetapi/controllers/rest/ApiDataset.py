@@ -5,7 +5,7 @@
 
 from flask import abort
 from flask_restful import Resource, request
-from cadetapi.models import DataSet
+#from cadetapi.models import DataSet
 from cadetapi.controllers.database.DbControl import DbDataset
 from cadetapi.schemas import DatasetSchema
 

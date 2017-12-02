@@ -5,7 +5,7 @@
 
 from flask import abort
 from flask_restful import Resource, request
-from cadetapi.models import ResultSet
+#from cadetapi.models import ResultSet
 from cadetapi.controllers.database.DbControl import DbResult
 from cadetapi.schemas import ResultSchema
 
@@ -26,6 +26,63 @@ class ResultApi(Resource):
             return result
         else:
             return result, 204
+
+    def createFauxResult(self):
+        result = {}
+        result['meta'] = {}
+        result['meta']['doc_id'] = 99
+        result['meta']['topics'] = 5
+        result['meta']['iterations'] = 100
+        result['meta']['words_per_topic'] = 5
+        result['topic_stats'] = []
+        topicdict = {}
+        topicdict['topic_id'] = 1
+        topicdict['topic_words'] = ['Alpha', 'Beta', 'Delta', 'Gamma', 'Iota']
+        topicdict['positive'] = ['Alpha', 'Gamma']
+        topicdict['neutral'] = ['Iota']
+        topicdict['negative'] = ['Beta', 'Delta']
+        result['topic_stats'].append(topicdict)
+        topicdict = {}
+        topicdict['topic_id'] = 2
+        topicdict['topic_words'] = ['Red', 'Blue', 'Green', 'Orange', 'Yellow']
+        topicdict['positive'] = ['Red', 'Yellow']
+        topicdict['neutral'] = ['Purple']
+        topicdict['negative'] = ['Blue', 'Green', 'Brown']
+        result['topic_stats'].append(topicdict)
+        topicdict = {}
+        topicdict['topic_id'] = 3
+        topicdict['topic_words'] = ['one', 'two', 'three', 'four', 'five']
+        topicdict['positive'] = ['seven', 'thirteen', 'eleven']
+        topicdict['neutral'] = ['twenty']
+        topicdict['negative'] = ['Green', 'Iota']
+        result['topic_stats'].append(topicdict)
+        result['instructor_stats'] = []
+        ratingdict = {}
+        ratingdict['course_sect'] = '605.101'
+        ratingdict['instr_first'] = 'Clark'
+        ratingdict['instr_last'] = 'Kent'
+        ratingdict['positive'] = ['one', 'two', 'three', 'four', 'five']
+        ratingdict['neutral'] = ['Red', 'Blue', 'Green', 'Orange', 'Yellow']
+        ratingdict['negative'] = ['Alpha', 'Beta', 'Delta', 'Gamma', 'Iota']
+        result['instructor_stats'].append(ratingdict)
+        ratingdict = {}
+        ratingdict['course_sect'] = 'Course of Solitude'
+        ratingdict['instr_first'] = 'Clark'
+        ratingdict['instr_last'] = 'Kent'
+        ratingdict['positive'] = ['one', 'two', 'three', 'four', 'five']
+        ratingdict['neutral'] = ['Red', 'Blue', 'Green', 'Orange', 'Yellow']
+        ratingdict['negative'] = ['Alpha', 'Beta', 'Delta', 'Gamma', 'Iota']
+        result['instructor_stats'].append(ratingdict)
+        ratingdict = {}
+        ratingdict['course_sect'] = 'Software Design Principles'
+        ratingdict['instr_first'] = 'Joel'
+        ratingdict['instr_last'] = 'Coffman'
+        ratingdict['positive'] = ['one', 'two', 'three', 'four', 'five']
+        ratingdict['neutral'] = ['Red', 'Blue', 'Green', 'Orange', 'Yellow']
+        ratingdict['negative'] = ['Alpha', 'Beta', 'Delta', 'Gamma', 'Iota']
+        result['instructor_stats'].append(ratingdict)
+        return result
+
 
 """
     def get(self, result_id=None):

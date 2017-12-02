@@ -5,7 +5,7 @@
 
 from flask import abort
 from flask_restful import Resource, request
-from cadetapi.models import Instructor
+#from cadetapi.models import Instructor
 from cadetapi.controllers.database.DbControl import DbInstructor
 from cadetapi.schemas import InstructorSchema
 

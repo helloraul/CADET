@@ -5,7 +5,7 @@
 
 from flask import abort
 from flask_restful import Resource, request
-from cadetapi.models import Stopword
+#from cadetapi.models import Stopword
 from cadetapi.controllers.database.DbControl import DbStopword
 from cadetapi.schemas import StopwordSchema
 
