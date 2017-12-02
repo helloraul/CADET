@@ -40,7 +40,7 @@ def test_init():
 def test_conversion():
     comment_object = CommentObject()
     for comment_dict in comment_dicts:
-        comment_object.convertCommentDict(comment_dict)
+        comment_object.convertFromCommentDict(comment_dict)
         # remove keys from test case that are not in the comment_keys
         for key in list(comment_dict.keys()):
             if key not in comment_keys:
