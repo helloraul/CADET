@@ -14,7 +14,7 @@ python3
 apt install python3-pip
 pip3 install nltk
 pip3 install stop-words
-python -m pip3 install --user numpy scipy
+python3 -m pip install --user numpy scipy
 pip3 install gensim
 python3
 >>> import nltk
