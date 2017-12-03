@@ -1,17 +1,14 @@
 "# CADET" 
 
 # dependencies
-python >= 2.7 or >= 3.4
-pip install flask
-pip install flask
-pip install flask-sqlalchemy
-pip install flask-restful
-pip install flask-marshmallow
-pip install marshmallow-sqlalchemy
-
-# analysis dependencies
-python3
+# requires python3
 apt install python3-pip
+pip3 install flask
+pip3 install flask
+pip3 install flask-sqlalchemy
+pip3 install flask-restful
+pip3 install flask-marshmallow
+pip3 install marshmallow-sqlalchemy
 pip3 install nltk
 pip3 install stop-words
 python3 -m pip install --user numpy scipy
