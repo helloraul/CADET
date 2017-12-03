@@ -9,8 +9,7 @@ from cadetapi.controllers.analysis.DatasetAnalysis import DatasetAnalysis as Ana
 
 if __name__ == '__main__':
 
-    dataset_ids = [1,2,3]
-    analyzer = Analyzer(dataset_ids, 3, 3, 5)
+    analyzer = Analyzer(1, 3, 3, 30)
     analyzer.runAnalysis()
     
     print("********Course Comments**********")

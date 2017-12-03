@@ -2,6 +2,7 @@ from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analy
 from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 from cadetapi.controllers.rest.ApiComment import CommentApi
+from cadetapi.controllers.database.DbControl import DbResult
 
 class DatasetAnalysis():
 
@@ -30,7 +31,8 @@ class DatasetAnalysis():
         return course_comment, instructor_comment
     
     def getCommentObjects(self):
-        for c_id in self.dataset_id:
+        comment_ids = DbResult().GetCommentIDs(self.result_set_id) #get from result_set_id
+        for c_id in comment_ids:
             c_comment, i_comment = self.formatDbComment(CommentApi().get(comment_id = c_id), c_id)
             c_comment = CommentObject(c_comment)
             i_comment = CommentObject(i_comment)
@@ -74,9 +76,9 @@ class DatasetAnalysis():
     def getTopicSentimentHistogram(self):
         return self.topic_sentiment_histogram
 
-    def __init__(self, dataset_id, num_topics = 3, words_per_topic = 3, iterations = 20):
+    def __init__(self, result_set_id, num_topics = 3, words_per_topic = 3, iterations = 20):
         self.num_topics = num_topics
         self.words_per_topic = words_per_topic
         self.iterations = iterations 
-        self.dataset_id = dataset_id
+        self.result_set_id = result_set_id
 
