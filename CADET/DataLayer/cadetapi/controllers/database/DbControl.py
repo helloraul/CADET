@@ -200,8 +200,8 @@ class DbComment():
             # Insert new comment into the comments table
             new_comment = Comment(
                 anon_id = comm['anon_id'],
-                course_id = comm['course_id'],
-                instructor_id = comm['instructor_id'],
+                course_id = self.course_id,
+                instructor_id = self.instructor_id,
                 c_com = comm['course_comments'],
                 i_com = comm['instructor_comments'],
                 a_com = comm['additional_comments'],
