@@ -40,7 +40,7 @@ class Comment():
         if 'instructor_last_name' in comment_dict: self.instructor_last_name = comment_dict['instructor_last_name']
         if 'sentiment' in comment_dict: self.sentiment = comment_dict['sentiment']
         if 'topic_model_id' in comment_dict: self.topic_model_id = comment_dict['topic_model_id']
-        if 'course_modality' in comment_dict: self.modality = comment_dict['course_modality']
+        if 'course' in comment_dict: self.course_modality = comment_dict['course']
 
     def convertToCommentDict(self):
         return {
@@ -88,10 +88,10 @@ class Comment():
         self.instructor_last_name = last_name
 
     def getModality(self):
-        return self.modality
+        return self.course_modality
 
     def setModality(self, modality):
-        self.modality = modality
+        self.course_modality = modality
 
     def getSentiment(self):
         return self.sentiment

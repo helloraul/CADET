@@ -30,7 +30,7 @@ class DatasetAnalysis():
         return course_comment, instructor_comment
     
     def getCommentObjects(self):
-        for c_id in self.dataset_ids:
+        for c_id in self.dataset_id:
             c_comment, i_comment = self.formatDbComment(CommentApi().get(comment_id = c_id), c_id)
             c_comment = CommentObject(c_comment)
             i_comment = CommentObject(i_comment)
@@ -42,7 +42,10 @@ class DatasetAnalysis():
         self.getCommentObjects()
         
         # get stop words from database
-        stop_words = StopwordApi().get()
+        stop_words = list()
+        for item in StopwordApi().get():
+            stop_words.append(item['stop_word'])
+        
         # stop_words = DbStopword().FullList()
         self.Analyzer = Analyzer(self.comments, stop_words, self.num_topics, self.words_per_topic, self.iterations)
 
@@ -71,9 +74,9 @@ class DatasetAnalysis():
     def getTopicSentimentHistogram(self):
         return self.topic_sentiment_histogram
 
-    def __init__(self, dataset_ids, num_topics = 3, words_per_topic = 3, iterations = 20):
+    def __init__(self, dataset_id, num_topics = 3, words_per_topic = 3, iterations = 20):
         self.num_topics = num_topics
         self.words_per_topic = words_per_topic
         self.iterations = iterations 
-        self.dataset_ids = dataset_ids
+        self.dataset_id = dataset_id
 
