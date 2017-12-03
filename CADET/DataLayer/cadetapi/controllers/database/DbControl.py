@@ -338,33 +338,22 @@ class DbDataset():
         else:
             self.pk = result.dataset_id
         
-        
-
-
         return self.pk
 
-    def GetDataset(self, pk):
+    def Query(self, pk):
         # Fetch existing dataset based on primary key
-        session = self.sess
-        self.pk = pk
-
-        # If there is an existing comment, check for that
-        result = session.query(CommentDataSet.comment_id).filter(
-            CommentDataSet.dataset_id == self.pk
+        # If there is an existing dataset, check for that
+        result = self.sess.query(CommentDataSet.comment_id).filter(
+            CommentDataSet.dataset_id == pk
             ).all()
-
-        if not result:
-            # Primary Key not found in database
-            return False
-        else:
-            del self.comments[:]
-            for comment_id in result:
-                # Re-initialize the comment object each time,
-                # or else we'll just overwrite by reference
-                newComment = DbComment()
-                self.comments.append(newComment.GetComment(comment_id[0]))
+        response = []
+        for comment_id in result:
+            # Re-initialize the comment object each time,
+            # or else we'll just overwrite by reference
+            newComment = DbComment()
+            response.append(newComment.GetComment(comment_id[0]))
             
-            return self.comments
+        return response
 
     def __init__(self):
         self.sess = DbSession()

@@ -11,10 +11,10 @@ from cadetapi.controllers.database.DbControl import DbResult
 class TestAnalysis(Resource):
     def get(self, result_id):
         # Retrieve comments from database
-        inst = DbResult()
-        result = inst.Query(result_id)
-        print(inst.GetCommentIDs(result_id))
-        return result
+        #inst = DbResult()
+        return DbResult().Query(result_id)
+        #print(inst.GetCommentIDs(result_id))
+        #return result
         
 
     def post(self):
