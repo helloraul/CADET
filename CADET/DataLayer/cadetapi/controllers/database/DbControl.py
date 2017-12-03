@@ -179,27 +179,32 @@ class DbComment():
                                               self.comment['instructor_last_name'])
         self.anon_id = self.comment['anon_id']
 
+        # PutComment returns comment ID
+        # Add comment to DB if does not exist
+        return self.PutComment(comm)
+
+    def PutComment(self, comm):
         session = self.sess
 
         # If there is an existing comment, check for that
         result = session.query(Comment).filter(db.and_(
-            Comment.anon_id       == self.comment['anon_id'],
+            Comment.anon_id       == comm['anon_id'],
             Comment.course_id     == self.course_id,
             Comment.instructor_id == self.instructor_id,
-            Comment.c_com         == self.comment['course_comments'],
-            Comment.i_com         == self.comment['instructor_comments'],
-            Comment.a_com         == self.comment['additional_comments'],
+            Comment.c_com         == comm['course_comments'],
+            Comment.i_com         == comm['instructor_comments'],
+            Comment.a_com         == comm['additional_comments'],
             )).first()
 
         if result is None:
             # Insert new comment into the comments table
             new_comment = Comment(
-                anon_id = self.comment['anon_id'],
-                course_id = self.course_id,
-                instructor_id = self.instructor_id,
-                c_com = self.comment['course_comments'],
-                i_com = self.comment['instructor_comments'],
-                a_com = self.comment['additional_comments'],
+                anon_id = comm['anon_id'],
+                course_id = comm['course_id'],
+                instructor_id = comm['instructor_id'],
+                c_com = comm['course_comments'],
+                i_com = comm['instructor_comments'],
+                a_com = comm['additional_comments'],
                 )
             session.add(new_comment)
             session.flush()
