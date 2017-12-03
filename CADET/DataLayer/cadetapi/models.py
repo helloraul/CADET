@@ -83,7 +83,6 @@ class ResultTopic(Base):
     __tablename__ = 'result_topics'
     id = db.Column(db.Integer, primary_key=True)
     result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
-    topic = db.Column(db.String(255))
     result = db.relationship(ResultSet)
 
 class TopicWord(Base):
@@ -93,15 +92,22 @@ class TopicWord(Base):
     word = db.Column(db.String(255))
     topic = db.relationship(ResultTopic)
 
-class ResultDetail(Base):
-    __tablename__ = 'result_comments'
+class ResultCourseComment(Base):
+    __tablename__ = 'result_course_comments'
     id = db.Column(db.Integer, primary_key=True)
-    #result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
     topic_id = db.Column(db.Integer, db.ForeignKey('result_topics.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
-    sentiment = db.Column(db.String(8)) # pos, neg, neutral
-    #result = db.relationship(ResultSet)
+    course_com_sent = db.Column(db.String(8)) # positive, negative, neutral
     topic = db.relationship(ResultTopic)
+    comment = db.relationship(Comment)
+
+class ResultInstructorComment(Base):
+    __tablename__ = 'result_instructor_comments'
+    id = db.Column(db.Integer, primary_key=True)
+    result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
+    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
+    instr_com_sent = db.Column(db.String(8)) # positive, negative, neutral
+    result = db.relationship(ResultSet)
     comment = db.relationship(Comment)
 
 def DbSession():

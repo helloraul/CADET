@@ -1,0 +1,43 @@
+{
+    "meta_file_info":{
+        "document_id_number":"3",
+        "user_selected_words_per_topic":"5",
+        "user_selected_number_topics":"4",
+        "user_selected_number_iterations":"30"
+    },
+    "raw_file_stats":[
+        {
+            "anon_id":"12",
+            "program":"Computer Science",
+            "modality":"classroom",
+            "course_num_sect_id":"604.211",
+            "instructor_last_name":"Coffman",
+            "instructor_first_name":"Joel",
+            "course_comments":"course comment 1",
+            "instructor_comments":"instructor comment 1",
+            "additional_comments":"additional comment 1"
+        },
+        {
+            "anon_id":"23",
+            "program":"Computer Science",
+            "modality":"classroom",
+            "course_num_sect_id":"604.211",
+            "instructor_last_name":"Coffman",
+            "instructor_first_name":"Joel",
+            "course_comments":"course comment 2",
+            "instructor_comments":"instructor comment 2",
+            "additional_comments":"additional comment 2"
+        },
+        {
+            "anon_id":"42",
+            "program":"Computer Science",
+            "modality":"classroom",
+            "course_num_sect_id":"604.211",
+            "instructor_last_name":"Coffman",
+            "instructor_first_name":"Joel",
+            "course_comments":"course comment 3",
+            "instructor_comments":"instructor comment 3",
+            "additional_comments":"additional comment 3"
+        }
+    ]
+}

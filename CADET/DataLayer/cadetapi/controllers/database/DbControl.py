@@ -172,8 +172,8 @@ class DbComment():
         self.__clear_comment()
         #self.comment = {**self.comment, **comm} # python >= 3.5
         self.comment.update(comm)
-        self.course_id = self.course.GetId(self.comment['course_program'],
-                                           self.comment['course_modality'],
+        self.course_id = self.course.GetId(self.comment['program'],
+                                           self.comment['modality'],
                                            self.comment['course_num_sect_id'])
         self.instructor_id = self.instr.GetId(self.comment['instructor_first_name'],
                                               self.comment['instructor_last_name'])
@@ -292,6 +292,8 @@ class DbDataset():
         # Insert if data does not already exist
         # Return primary key identifier
         
+        # reset (clear) existing comment_keys
+        del self.comment_keys[:]
         #iterate through each comment, collecting IDs as we go
         for SingleComment in dataset:
             newId = self.comment.GetId(SingleComment)
@@ -374,13 +376,13 @@ class DbStopword():
             # Primary Key not found in database
             return False
         else:
-            del self.stop_list[:]
+            del self.word_list[:]
             self.word_string = ''
             for word in result:
                 # Re-initialize the comment object each time,
                 # or else we'll just overwrite by reference
                 self.word_list.append(word[0])
-            self.word_string = ' '.join(word_list)
+            self.word_string = ' '.join(self.word_list)
             return self.word_string
 
     def InsertWord(self, word):
@@ -420,13 +422,153 @@ class DbResult():
         # store analysis based on predetermined ID
 
         # first check to make sure we don't already have something
-        existing = self.GetAnalysis(pk)
-        if existing:
-            return false #not positive this should be the return value
+        exists = self.GetAnalysis(pk)
+        if exists:
+            print('Cannot insert analysis, analysis has already been performed')
+            return True #not positive this should be the return value
 
+        # Fetch the dataset id, which we will need later
+        result = self.sess.query(ResultSet).filter(
+                ResultSet.id == pk,
+            ).first()
 
+        if result is None:
+            print("result set id " + pk + " does not exist")
+            return False
 
+        dsid = result.dataset_id
 
+        # iterate through topics
+        for topic in analysis['topics_stats']:
+            success = self.__StoreTopic(pk, topic)
+            if not success:
+                print('Could not store topic')
+                return False
+
+        # iterate through instructor analysis
+        for instr in analysis['instructor_stats']:
+            success = self.__StoreInstr(pk, instr)
+            if not success:
+                print('could not store instructor analysis')
+                return False
+
+        # single commit for the full insert
+        self.sess.commit()
+        return True
+
+    def __StoreTopic(self, pk, topic):
+        new_record = ResultTopic(
+                result_id = pk,
+            )
+        self.sess.add(new_record)
+        self.sess.flush()
+        topic_pk = new_record.id
+        
+        # Store the Comment Sentiments
+        for topic_sent in topic['comments']: #positive, neutral, negative
+            for topic_comment in topic['comments'][topic_sent]:
+                success = self.__StoreCourseComment(topic_pk, topic_comment, topic_sent)
+                if not success:
+                    print('Failed to store topic sentiments')
+                    return False
+
+        # Store the Topic Words
+        for topic_word in topic['topic_words']:
+            new_record = TopicWord(
+                topic_id = topic_pk,
+                word = topic_word,
+            )
+            self.sess.add(new_record)
+        
+        self.sess.flush()
+        return True
+
+    def __StoreCourseComment(self, topic_pk, topic_comment, topic_sent):
+        # topic_comment is the actual string text of the comment
+        # what we need is the pk from the comments table
+        # we need to find the right one, based on the dataset that was analyzed
+        # it could even be more than one (identical words), in which case
+        # we'll store both (all)
+        query = self.sess.query(Comment.id).filter(db.and_(
+                Comment.c_com == topic_comment,
+                ResultTopic.id == topic_pk,
+            ))
+        query = query.join(CommentDataSet)
+        query = query.join(DataSet)
+        query = query.join(ResultSet)
+        query = query.join(ResultTopic)
+        result = query.all()
+
+        if result is None:
+            print('could not find comment id for: ' + topic_comment)
+            return False
+
+        for comment_pk in result:
+            new_record = ResultCourseComment(
+                    topic_id = topic_pk,
+                    comment_id = comment_pk.id,
+                    course_com_sent = topic_sent,
+                )
+            self.sess.add(new_record)
+            
+        self.sess.flush()
+
+        return True
+
+    def __StoreInstr(self, result_pk, instr):
+        # Store the Comment Sentiments
+        for inst_sent in instr['comments']: #positive, neutral, negative
+            for inst_comment in instr['comments'][inst_sent]:
+                success = self.__StoreInstrComment(
+                                    result_pk, 
+                                    inst_comment, 
+                                    inst_sent, 
+                                    instr['course_num_sect_id'], 
+                                    instr['instructor_last_name'], 
+                                    instr['instructor_first_name'],
+                                )
+                if not success:
+                    print('Failed to store instructor comment')
+                    return False
+
+        return True
+
+    def __StoreInstrComment(self, result_pk, inst_comment, inst_sent, 
+                            num_sec, i_last, i_first):
+        # topic_comment is the actual string text of the comment
+        # what we need is the pk from the comments table
+        # we need to find the right one, based on the dataset that was analyzed
+        # it could even be more than one (identical words), in which case
+        # we'll store both, but we'll also deduplicate as we go
+        query = self.sess.query(Comment.id).filter(db.and_(
+                Comment.i_com == inst_comment,
+                ResultSet.id == result_pk,
+                Instructor.last_name == i_last,
+                Instructor.first_name == i_first,
+                Course.num_sec == num_sec,
+            ))
+        query = query.join(Instructor)
+        query = query.join(Course)
+        query = query.join(CommentDataSet)
+        query = query.join(DataSet)
+        query = query.join(ResultSet)
+        result = query.all()
+
+        if result is None:
+            print('Could not find comment id for inst comment: ' + inst_comment)
+            return False
+
+        for comment_pk in result:
+            new_record = ResultInstructorComment(
+                    result_id = result_pk,
+                    comment_id = comment_pk.id,
+                    instr_com_sent = inst_sent,
+                )
+            self.sess.add(new_record)
+            
+        self.sess.flush()
+
+        return True
 
     def GetId(self, comments, topics, words, num_it):
         # retrieve result set
@@ -464,7 +606,110 @@ class DbResult():
         return self.pk
 
     def GetAnalysis(self, pk):
-        return self.pk
+        # get criteria to return with the analysis
+        query = self.sess.query(ResultSet)
+        query = query.filter(ResultSet.id == pk)
+        result = query.first()
+        if result is None:
+            print('Result set id ' + str(pk) + ' does not exist')
+            return False
+
+        response = {}
+        response['result_id'] = pk
+        criteria = {}
+        criteria['document_id_number'] = result.dataset_id
+        criteria['user_selected_number_topics'] = result.topic_cnt
+        criteria['user_selected_number_iterations'] = result.iterations
+        criteria['user_selected_words_per_topic'] = result.word_cnt
+        response['meta_file_info'] = criteria
+        response['results'] = {}
+        response['results']['topics_stats'] = []
+        response['results']['instructor_stats'] = []
+
+        # get the topics, words, comments, and sentiments
+        # if we don't have any topics, that must mean there's no result
+        query = self.sess.query(ResultTopic)
+        query = query.filter(ResultTopic.result_id == pk)
+        result = query.all()
+        if not result:
+            print('Analysis has not been performed for result set ' + str(pk))
+            return False
+
+        for row in result:
+            topic = {}
+            topic['comments'] = {}
+            topic['comments']['positive'] = []
+            topic['comments']['neutral'] = []
+            topic['comments']['negative'] = []
+            topic['words'] = []
+            #fetch comments
+            query = self.sess.query(
+                    Comment.c_com, 
+                    ResultCourseComment.course_com_sent,
+                )
+            query = query.filter(ResultCourseComment.topic_id == row.id)
+            query = query.join(ResultCourseComment)
+            topic_result = query.all()
+            for comment in topic_result:
+                topic['comments'][comment.course_com_sent].append(comment.c_com)
+
+            #fetch words
+            query = self.sess.query(TopicWord)
+            query = query.filter(TopicWord.topic_id == row.id)
+            topic_result = query.all()
+            for word in topic_result:
+                topic['words'].append(word.word)
+
+            response['results']['topics_stats'].append(topic)
+
+        # get the instructor comments and sentiments
+        query = self.sess.query(
+                        Course.num_sec,
+                        Instructor.first_name,
+                        Instructor.last_name,
+                    )
+        query = query.filter(ResultInstructorComment.result_id == pk)
+        query = query.join(Comment)
+        query = query.join(Instructor)
+        query = query.join(ResultInstructorComment)
+        print(query)
+        result = query.distinct().all()
+        if not result:
+            # No instructor comments, nothing else to be done
+            return response
+
+        for row in result:
+            instcom = {}
+            instcom['course_num_sect_id'] = row.num_sec
+            instcom['instructor_last_name'] = row.last_name
+            instcom['instructor_first_name'] = row.first_name
+            comlist = {}
+            comlist['positive'] = []
+            comlist['neutral'] = []
+            comlist['negative'] = []
+
+            query = self.sess.query(
+                    Comment.i_com,
+                    ResultInstructorComment.instr_com_sent,
+                )
+            query = query.filter(db.and_(
+                    ResultInstructorComment.result_id == pk,
+                    Course.num_sec == row.num_sec,
+                    Instructor.first_name == row.first_name,
+                    Instructor.last_name == row.last_name,
+                ))
+            query = query.join(Course)
+            query = query.join(Instructor)
+            query = query.join(ResultInstructorComment)
+            #print(query)
+            instr_result = query.all()
+            for comment in instr_result:
+                comlist[comment.instr_com_sent].append(comment.i_com)
+
+            instcom['comments'] = comlist
+            response['results']['instructor_stats'].append(instcom)
+        
+        return response
 
     def __init__(self):
         self.sess = DbSession()
