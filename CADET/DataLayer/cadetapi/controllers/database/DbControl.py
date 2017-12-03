@@ -149,8 +149,8 @@ class DbCourse():
 
     def Query(self, pk=None):
         query = self.sess.query(
-                    Course.program.label('course_program'),
-                    Course.modality.label('course_modality'),
+                    Course.program.label('program'),
+                    Course.modality.label('modality'),
                     Course.num_sec.label('course_num_sect_id'),
                 )
         if pk is None:
@@ -234,8 +234,8 @@ class DbComment():
             self.comment['anon_id'] = result.anon_id
             self.comment['instructor_first_name'] = fname
             self.comment['instructor_last_name'] = lname
-            self.comment['course_program'] = prog
-            self.comment['course_modality'] = mod
+            self.comment['program'] = prog
+            self.comment['modality'] = mod
             self.comment['course_num_sect_id'] = num
             self.comment['course_comments'] = result.c_com
             self.comment['instructor_comments'] = result.i_com
@@ -249,8 +249,8 @@ class DbComment():
         self.comment['anon_id'] = 0
         self.comment['instructor_first_name'] = ''
         self.comment['instructor_last_name'] = ''
-        self.comment['course_program'] = ''
-        self.comment['course_modality'] = ''
+        self.comment['program'] = ''
+        self.comment['modality'] = ''
         self.comment['course_num_sect_id'] = ''
         self.comment['course_comments'] = ''
         self.comment['instructor_comments'] = ''
@@ -259,8 +259,8 @@ class DbComment():
     def Query(self, pk=None):
         query = self.sess.query(
                     Comment.anon_id.label('anon_id'),
-                    Course.program.label('course_program'),
-                    Course.modality.label('course_modality'),
+                    Course.program.label('program'),
+                    Course.modality.label('modality'),
                     Course.num_sec.label('course_num_sect_id'),
                     Instructor.first_name.label('instructor_first_name'),
                     Instructor.last_name.label('instructor_last_name'),
