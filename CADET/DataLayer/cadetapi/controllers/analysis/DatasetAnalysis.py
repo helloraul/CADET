@@ -1,8 +1,8 @@
 from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
-from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 from cadetapi.controllers.rest.ApiComment import CommentApi
 from cadetapi.controllers.database.DbControl import DbResult
+from cadetapi.controllers.database.DbControl import DbStopword
 
 class DatasetAnalysis():
 
@@ -44,11 +44,8 @@ class DatasetAnalysis():
         self.getCommentObjects()
         
         # get stop words from database
-        stop_words = list()
-        for item in StopwordApi().get():
-            stop_words.append(item['stop_word'])
-        
-        # stop_words = DbStopword().FullList()
+        stop_words = DbStopword().FullList()
+
         self.Analyzer = Analyzer(self.comments, stop_words, self.num_topics, self.words_per_topic, self.iterations)
 
         self.Analyzer.runAnalysis() # This will take time !!!!

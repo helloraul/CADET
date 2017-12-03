@@ -295,8 +295,5 @@ class AnalysisModule():
     
         # set the stop words for topic processing
         self.stop_words = set(stopwords.words('english'))
-        self.stop_words.update(['.', ',', '"', "'", '?', '!', ':', ';', '(', ')', '[', ']', '{', '}']) # remove if you need punctuation
-        self.stop_words.update(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','u','x','y','z','0','1','2','3','4','5','6','7','8','9'])
         self.stop_words.update(stop_words)
-
 
