@@ -371,24 +371,16 @@ class DbDataset():
         self.comment = DbComment()
 
 class DbStopword():
-    word_list = []
-    word_string = ''
 
     def FullList(self):
+        response = []
         query = self.sess.query(Stopword.stop_word)
         result = query.all()
-        if not result:
-            # Primary Key not found in database
-            return False
-        else:
-            del self.word_list[:]
-            self.word_string = ''
-            for word in result:
-                # Re-initialize the comment object each time,
-                # or else we'll just overwrite by reference
-                self.word_list.append(word[0])
-            self.word_string = ' '.join(self.word_list)
-            return self.word_string
+        
+        for word in result:
+            response.append(word.stop_word)
+            
+        return response
 
     def InsertWord(self, word):
         for w in word:
@@ -582,7 +574,8 @@ class DbResult():
         dataset = DbDataset()
         dsid = dataset.GetId(comments)
         sw = DbStopword()
-        swl = sw.FullList()
+        stop_word_list = sw.FullList()
+        stop_word_string = ' '.join(stop_word_list)
         
         # If there is an existing dataset, check for that
         result = self.sess.query(ResultSet).filter(db.and_(
@@ -590,7 +583,7 @@ class DbResult():
             ResultSet.topic_cnt  == topics,
             ResultSet.word_cnt   == words,
             ResultSet.iterations == num_it,
-            ResultSet.stop_words == swl,
+            ResultSet.stop_words == stop_word_string,
             )).first()
 
         if result is None: # record does not yet exist in the database
@@ -600,7 +593,7 @@ class DbResult():
                 topic_cnt = topics,
                 word_cnt = words,
                 iterations = num_it,
-                stop_words = swl,
+                stop_words = stop_word_string,
                 )
             self.sess.add(record)
             self.sess.flush()
