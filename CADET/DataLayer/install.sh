@@ -1,1 +1,1 @@
-sudo pip install --editable .
+sudo pip3 install --editable .
