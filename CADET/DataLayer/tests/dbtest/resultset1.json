@@ -10,15 +10,9 @@
         "topics_stats":[
             {
                 "comments":{
-                    "positive":[
-                        "course comment 1"
-                    ],
-                    "neutral":[
-                        "course comment 2"
-                    ],
-                    "negative":[
-                        "course comment 3"
-                    ]
+                    "positive":[ 4 ],
+                    "neutral":[ 5 ],
+                    "negative":[ 6 ]
                 },
                 "topic_words":[
                     "who",
@@ -35,15 +29,9 @@
                 "instructor_last_name":"Coffman",
                 "instructor_first_name":"Joel",
                 "comments":{
-                    "positive":[
-                        "instructor comment 1"
-                    ],
-                    "neutral":[
-                        "instructor comment 2"
-                    ],
-                    "negative":[
-                        "instructor comment 3"
-                    ]
+                    "positive":[ 4 ],
+                    "neutral":[ 5 ],
+                    "negative":[ 6 ]
                 }
             }
         ]
