@@ -1,5 +1,5 @@
 from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
-#from cadetapi.controllers.rest.ApiStopword import StopwordApi
+from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.database.DbControl import DbStopword
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 
@@ -23,8 +23,8 @@ class Processor():
     def process(self):
 
         # get stop words from database
-        #stop_words = StopwordApi().get()
-        stop_words = DbStopword().FullList()
+        stop_words = StopwordApi().get()
+        # stop_words = DbStopword().FullList()
         self.Analyzer = Analyzer(self.comment_list, stop_words, self.num_topics, self.words_per_topic, self.iterations)
 
         self.Analyzer.runAnalysis() # This will take time !!!!

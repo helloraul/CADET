@@ -1,4 +1,5 @@
-from cadetapi.controllers.analysis.Processor import Processor 
+from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
+from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 from cadetapi.controllers.rest.ApiComment import CommentApi
 
@@ -39,28 +40,40 @@ class DatasetAnalysis():
 
     def runAnalysis(self):
         self.getCommentObjects()
-        self.processor.init(self.comments, self.num_topics, self.words_per_topic, self.iterations)
-        self.processor.process()
+        
+        # get stop words from database
+        stop_words = StopwordApi().get()
+        # stop_words = DbStopword().FullList()
+        self.Analyzer = Analyzer(self.comments, stop_words, self.num_topics, self.words_per_topic, self.iterations)
+
+        self.Analyzer.runAnalysis() # This will take time !!!!
+                                  # Once complete, we can get data 
+        
+        self.topic_model = self.Analyzer.getTopicModel()
+        self.topic_sentiment_histogram = self.Analyzer.getTopicHistogram()
+        self.courseCommentList = self.Analyzer.getCourseComments()
+        self.instructor_sentiment_histogram = self.Analyzer.getInstructorSentimentHistogram()
+        self.instructorCommentList = self.Analyzer.getInstructorComments()
+        self.hasFinishedLoad = True
 
     def getCourseCommentList(self):
-        return self.processor.getCourseCommentList()
+        return self.courseCommentList
 
     def getInstructorCommentList(self):
-        return self.processor.getInstructorCommentList()
+        return self.instructorCommentList
 
     def getInstructorSentimentHistogram(self):
-        return self.processor.getInstructorSentimentHistogram()
+        return self.instructor_sentiment_histogram
 
     def getTopicModel(self):
-        return self.processor.getTopicModel()
+        return self.topic_model
 
     def getTopicSentimentHistogram(self):
-        return self.processor.getTopicSentimentHistogram()
+        return self.topic_sentiment_histogram
 
     def __init__(self, dataset_ids, num_topics = 3, words_per_topic = 3, iterations = 20):
         self.num_topics = num_topics
         self.words_per_topic = words_per_topic
         self.iterations = iterations 
         self.dataset_ids = dataset_ids
-        self.processor = Processor()
 
