@@ -427,7 +427,7 @@ class DbResult():
         # store analysis based on predetermined ID
 
         # first check to make sure we don't already have something
-        exists = self.GetAnalysis(pk)
+        exists = self.Query(pk)
         if exists:
             print('Cannot insert analysis, analysis has already been performed')
             return True #not positive this should be the return value
@@ -610,7 +610,7 @@ class DbResult():
             self.pk = result.id
         return self.pk
 
-    def GetAnalysis(self, pk):
+    def Query(self, pk):
         # get criteria to return with the analysis
         query = self.sess.query(ResultSet)
         query = query.filter(ResultSet.id == pk)
@@ -714,6 +714,17 @@ class DbResult():
             instcom['comments'] = comlist
             response['results']['instructor_stats'].append(instcom)
         
+        return response
+
+    def GetCommentIDs(self, result_id):
+        query = self.sess.query(CommentDataSet.comment_id)
+        query = query.filter(ResultSet.id == result_id)
+        query = query.join(DataSet)
+        query = query.join(ResultSet)
+        result = query.all()
+        response = []
+        for comment in result:
+            response.append(comment.comment_id)
         return response
 
     def __init__(self):

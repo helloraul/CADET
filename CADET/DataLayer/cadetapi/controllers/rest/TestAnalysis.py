@@ -12,14 +12,10 @@ class TestAnalysis(Resource):
     def get(self, result_id):
         # Retrieve comments from database
         inst = DbResult()
-        result = inst.GetAnalysis(result_id)
+        result = inst.Query(result_id)
+        print(inst.GetCommentIDs(result_id))
         return result
-        # return result dict and 204 code if empty
-        if (result):
-            return result
-        else:
-            return result, 204
-
+        
 
     def post(self):
         # Receive single comment as json object (primarily for unit testing)
