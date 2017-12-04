@@ -13,8 +13,8 @@ ma=Marshmallow()
 
 class CommentSchema(ModelSchema):
     anon_id = field_for(Comment, 'anon_id', dump_only=True)
-    course_program = field_for(Course, 'program', dump_only=True)
-    course_modality = field_for(Course, 'modality', dump_only=True)
+    program = field_for(Course, 'program', dump_only=True)
+    modality = field_for(Course, 'modality', dump_only=True)
     course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
     instructor_first_name = field_for(Instructor, 'first_name', dump_only=True)
     instructor_last_name = field_for(Instructor, 'last_name', dump_only=True)
