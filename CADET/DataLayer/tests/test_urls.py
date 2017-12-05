@@ -5,6 +5,10 @@ import cadetapi
 import unittest
 import json
 
+# in python3, need to change strings to btyes, and dont forget to supply an encoding
+def isStringIn(s, obj):
+    return bytes(s, encoding='utf8') in obj
+
 class TestURLs(unittest.TestCase):
     def setUp(self):
         cadetapi.app.testing = True
@@ -67,13 +71,14 @@ class TestURLs(unittest.TestCase):
                 additional_comments = "additional comment 3"
             )]))
 
-        return self.client.post('/api/Dataset', data=postdata, content_type='application/json')
+        return self.client.post('/api/Dataset/', data=postdata, content_type='application/json')
 
     def test_root_return(self):
         """Tests if the root URL gives Hello, World"""
         result = self.client.get('/')
         assert result.status_code == 200
-        assert "Hello, World" in result.data
+        assert isStringIn("Hello, World", result.data)
+
 
     def test_comment_return(self):
         """Tests the Comment URL"""
@@ -93,21 +98,21 @@ class TestURLs(unittest.TestCase):
         result = self.post_comment()
         assert result.status_code == 200
         assert result.headers['Content-Type'] == "application/json"
-        assert 'comment_id' in result.data
+        assert isStringIn("comment_id", result.data)
         # check comment in database
         result = self.client.get('/api/Comment')
         assert result.status_code == 200
         assert result.headers['Content-Type'] == "application/json"
-        assert "anon_id" in result.data
-        assert "course_num_sect_id" in result.data
-        assert "additional_comments" in result.data
+        assert isStringIn("anon_id", result.data)
+        assert isStringIn("course_num_sect_id", result.data)
+        assert isStringIn("additional_comments", result.data)
         # check comment in database specifying element
         result = self.client.get('/api/Comment/1')
         assert result.status_code == 200
         assert result.headers['Content-Type'] == "application/json"
-        assert "anon_id" in result.data
-        assert "course_num_sect_id" in result.data
-        assert "additional_comments" in result.data
+        assert isStringIn("anon_id", result.data)
+        assert isStringIn("course_num_sect_id", result.data)
+        assert isStringIn("additional_comments", result.data)
 
     def test_dataset(self):
         """Tests the Dataset URL"""
@@ -128,7 +133,7 @@ class TestURLs(unittest.TestCase):
         print(result.status_code)
         assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
-        assert 'result_id' in result.data
+        assert isStringIn("result_id", result.data)
 #        # check comment in database
 #        result = self.client.get('/api/Comment')
 #        assert result.status_code == 200
