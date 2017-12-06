@@ -96,7 +96,7 @@ class TestURLs(unittest.TestCase):
         assert result.headers['Content-Type'] == "application/json"
         # post data to comment table
         result = self.post_comment()
-        assert result.status_code == 200
+        assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
         assert isStringIn("comment_id", result.data)
         # check comment in database
@@ -116,38 +116,38 @@ class TestURLs(unittest.TestCase):
 
     def test_dataset(self):
         """Tests the Dataset URL"""
-#        # check root dataset url
-#        result = self.client.get('/api/dataset')
-#        assert result.status_code == 204 # expecting the table to be empty
-#        assert result.headers['Content-Type'] == "application/json"
-#        # check again with trailing slash
-#        result = self.client.get('/api/Comment/')
-#        assert result.status_code == 204 # expecting the table to be empty
-#        assert result.headers['Content-Type'] == "application/json"
-#        # check element from Comment
-#        result = self.client.get('/api/Comment/1')
-#        assert result.status_code == 204 # expecting the element to not exist
-#        assert result.headers['Content-Type'] == "application/json"
-#        # post data to comment table
+        # check root dataset url
+        result = self.client.get('/api/Dataset')
+        assert result.status_code == 204 # expecting the table to be empty
+        assert result.headers['Content-Type'] == "application/json"
+        # check again with trailing slash
+        result = self.client.get('/api/Dataset/')
+        assert result.status_code == 204 # expecting the table to be empty
+        assert result.headers['Content-Type'] == "application/json"
+        # check element from Comment
+        result = self.client.get('/api/Dataset/1')
+        assert result.status_code == 204 # expecting the element to not exist
+        assert result.headers['Content-Type'] == "application/json"
+        # post data to comment table
         result = self.post_dataset()
-        print(result.status_code)
         assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
         assert isStringIn("result_id", result.data)
-#        # check comment in database
-#        result = self.client.get('/api/Comment')
-#        assert result.status_code == 200
-#        assert result.headers['Content-Type'] == "application/json"
-#        assert "anon_id" in result.data
-#        assert "course_num_sect_id" in result.data
-#        assert "additional_comments" in result.data
-#        # check comment in database specifying element
-#        result = self.client.get('/api/Comment/1')
-#        assert result.status_code == 200
-#        assert result.headers['Content-Type'] == "application/json"
-#        assert "anon_id" in result.data
-#        assert "course_num_sect_id" in result.data
-#        assert "additional_comments" in result.data
+        # check comment in database
+        result = self.client.get('/api/Dataset')
+        print(result.data)
+        assert result.status_code == 200
+        assert result.headers['Content-Type'] == "application/json"
+        assert "anon_id" in result.data
+        assert "course_num_sect_id" in result.data
+        assert "additional_comments" in result.data
+        # check comment in database specifying element
+        result = self.client.get('/api/Dataset/1')
+        assert result.status_code == 200
+        assert result.headers['Content-Type'] == "application/json"
+        assert "anon_id" in result.data
+        assert "course_num_sect_id" in result.data
+        assert "additional_comments" in result.data
 
 
 #    def test_result_return(self):
