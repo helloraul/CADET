@@ -35,23 +35,24 @@ class StopwordSchema(ModelSchema):
     word_id = field_for(Stopword, 'id', dump_only=True)
     stop_word = field_for(Stopword, 'stop_word', dump_only=True)
 
-class DatasetSchema(ModelSchema):
-    stub = 'need to do this'
-
 class MetaSchema(ModelSchema):
     doc_id = ma.Integer()
     topics = ma.Integer()
     iterations = ma.Integer()
     words_per_topic = ma.Integer()
 
-class TopicSchema(ModelSchema):
+class DatasetSchema(ModelSchema):
+    meta_file_info = ma.Nested(MetaSchema)
+    raw_file_stats = ma.Nested(CommentSchema(many=True))
+
+class ResultTopicSchema(ModelSchema):
     topic_id = ma.Integer()
     topic_words = ma.List(ma.String())
     positive = ma.List(ma.String())
     neutral  = ma.List(ma.String())
     negative = ma.List(ma.String())
 
-class RatingSchema(ModelSchema):
+class ResultInstructorSchema(ModelSchema):
     course_sect = ma.String()
     instr_first = ma.String()
     instr_last  = ma.String()
@@ -61,5 +62,6 @@ class RatingSchema(ModelSchema):
 
 class ResultSchema(ModelSchema):
     meta = ma.Nested(MetaSchema)
-    topic_stats = ma.Nested(TopicSchema(many=True))
-    instructor_stats = ma.Nested(RatingSchema(many=True))
+    topic_stats = ma.Nested(ResultTopicSchema(many=True))
+    instructor_stats = ma.Nested(ResultInstructorSchema(many=True))
+
