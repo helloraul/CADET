@@ -27,6 +27,13 @@ class DatasetApi(Resource):
         else:
             return result, 204
 
+
+    def post(self):
+        NewDataset = DbDataset()
+        response = {}
+        response = NewDataset.GetId(request.get_json()['raw_file_stats'])
+        return response, 201
+
 """
     def get(self, dataset_id=None):
         if dataset_id:
