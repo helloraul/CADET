@@ -25,14 +25,31 @@ class DatasetApi(Resource):
         if (result):
             return result
         else:
-            return result, 204
-
+            return result, 204z
 
     def post(self):
-        NewDataset = DbDataset()
+        # Receive single comment as json object (primarily for unit testing)
+        record = DbResult()
+        recordValidate = DatasetAnalysis()
+        req = request.get_json()
+        meta = req['meta_file_info']
+      
+        pk = record.GetId(
+                req['raw_file_stats'],
+                meta['user_selected_number_topics'],
+                meta['user_selected_words_per_topic'],
+                meta['user_selected_number_iterations'],
+            )
         response = {}
-        response = NewDataset.GetId(request.get_json()['raw_file_stats'])
-        return response, 201
+        response['resultset_id'] = pk
+
+"""""
+ a call to analyze api
+"""""
+        if (record.Query(pk)= false) 
+           recordValidate.runAnalysis(pk)
+        return response
+
 
 """
     def get(self, dataset_id=None):
@@ -45,3 +62,5 @@ class DatasetApi(Resource):
             datasets = DataSet.query.all()
             return datasets
 """
+
+ 
