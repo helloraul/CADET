@@ -33,7 +33,7 @@ class CommentApi(Resource):
         NewComment = DbComment()
         response = {}
         response['comment_id'] = NewComment.GetId(request.get_json())
-        return response
+        return response, 201
 
 """
     def get(self, comment_id=None):
