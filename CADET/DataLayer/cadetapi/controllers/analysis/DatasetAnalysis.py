@@ -83,45 +83,27 @@ class DatasetAnalysis():
                 topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
             topics_stats[topic_id]['topic_words'].extend(self.topic_model[topic_id])
         self.topic_results = topics_stats
-        
 
-    # **************************************************
-    # *********                            *************
-    # ********* FIX THIS TERRIBLE FUNCTION *************
-    # *********                            *************
-    # **************************************************
     def formatInstructorCommentResults(self):
         instructor_stats = []
-
+        for instructor in self.instructor_sentiment_histogram.keys():
+            instructor_stats.append({
+                'instructor_first_name':instructor.split(', ')[1],
+                'instructor_last_name':instructor.split(',')[0],
+                'comments':{
+                    'positive':[],
+                    'negative':[],
+                    'neutral':[]
+                    }
+                })
+        
         for comment in self.instructorCommentList:
             fname, lname = comment.getInstructor()
             for index, x in enumerate(instructor_stats):
                 if fname == instructor_stats[index]['instructor_first_name'] and lname == instructor_stats[index]['instructor_last_name']:
                     instructor_stats[index]['comments'][comment.getSentiment()].append(comment.getCommentId())
-                    break
-                elif index == len(instructor_stats):
-                    instructor_stats.append({
-                        'instructor_first_name':fname,
-                        'instructor_last_name':lname,
-                        'course_num_sect_id':comment.getCourse(),
-                        'comments':{
-                            'positive':[],
-                            'negative':[],
-                            'neutral':[]
-                            }})
-                    instructor_stats[index+1]['comments'][comment.getSentiment()].append(comment.getCommentId())
-            if not instructor_stats:
-                instructor_stats.append({
-                    'instructor_first_name':fname,
-                    'instructor_last_name':lname,
-                    'course_num_sect_id':comment.getCourse(),
-                    'comments':{
-                        'positive':[],
-                        'negative':[],
-                        'neutral':[]
-                        }})
-                instructor_stats[0]['comments'][comment.getSentiment()].append(comment.getCommentId())
-
+                    if 'course_num_sect_id' not in instructor_stats[index].keys():
+                        instructor_stats[index]['course_num_sect_id'] = comment.getCourse()
         self.instructor_results = instructor_stats
 
     def getResults(self):

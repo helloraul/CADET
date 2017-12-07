@@ -249,7 +249,7 @@ class AnalysisModule():
         for comment_object in instructorCommentList:
             sentiment = sentimentAnalyzer.sentiment(comment_object.comment)
             sentiment_dict[comment_object.comment_id] = sentiment
-            name = comment_object.instructor_first_name + ' ' + comment_object.instructor_last_name
+            name = comment_object.instructor_last_name + ', ' + comment_object.instructor_first_name
             
             if name not in instructor_sentiment_histogram:
                instructor_sentiment_histogram[name] = [0]*3 # initialize the histogram for this instructor (array of 3 items)
