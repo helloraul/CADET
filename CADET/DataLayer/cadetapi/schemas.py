@@ -36,7 +36,7 @@ class StopwordSchema(ModelSchema):
     stop_word = field_for(Stopword, 'stop_word', dump_only=True)
 
 class MetaSchema(ModelSchema):
-    document_id_number = ma.Integer()
+    document_id_number = ma.Integer(dump_only=True)
     user_selected_number_topics = ma.Integer()
     user_selected_number_iterations = ma.Integer()
     user_selected_words_per_topic = ma.Integer()

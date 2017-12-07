@@ -5,7 +5,7 @@ import cadetapi
 import unittest
 import json
 
-# in python3, need to change strings to btyes, and dont forget to supply an encoding
+# in python3, need to change strings to bytes, and dont forget to supply an encoding
 def isStringIn(s, obj):
     return bytes(s, encoding='utf8') in obj
 
@@ -13,6 +13,12 @@ class TestURLs(unittest.TestCase):
     def setUp(self):
         cadetapi.app.testing = True
         self.client = cadetapi.app.test_client()
+
+    # def tearDown(self):
+        # db_uri = cadetapi.app.config['SQLALCHEMY_DATABASE_URI']
+        # db_file = os.path.normpath(db_uri)[7:]
+        # print(db_file)
+        # os.remove(db_file)
 
     def post_comment(self):
         postdata = json.dumps(dict(
@@ -132,10 +138,10 @@ class TestURLs(unittest.TestCase):
         result = self.post_dataset()
         assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
-        assert isStringIn("result_id", result.data)
+        assert isStringIn("resultset_id", result.data)
         # check comment in database
         result = self.client.get('/api/Dataset')
-        print(result.data)
+        print(result.data, result.status_code)
         assert result.status_code == 200
         assert result.headers['Content-Type'] == "application/json"
         assert "anon_id" in result.data
@@ -143,6 +149,7 @@ class TestURLs(unittest.TestCase):
         assert "additional_comments" in result.data
         # check comment in database specifying element
         result = self.client.get('/api/Dataset/1')
+        print(result.data, result)
         assert result.status_code == 200
         assert result.headers['Content-Type'] == "application/json"
         assert "anon_id" in result.data
