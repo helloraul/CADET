@@ -36,32 +36,34 @@ class StopwordSchema(ModelSchema):
     stop_word = field_for(Stopword, 'stop_word', dump_only=True)
 
 class MetaSchema(ModelSchema):
-    doc_id = ma.Integer()
-    topics = ma.Integer()
-    iterations = ma.Integer()
-    words_per_topic = ma.Integer()
+    document_id_number = ma.Integer()
+    user_selected_number_topics = ma.Integer()
+    user_selected_number_iterations = ma.Integer()
+    user_selected_words_per_topic = ma.Integer()
+
+class CommentSentimentSchema(ModelSchema):
+    positive = ma.List(ma.String())
+    neutral = ma.List(ma.String())
+    negative = ma.List(ma.String())
 
 class DatasetSchema(ModelSchema):
     meta_file_info = ma.Nested(MetaSchema)
-    raw_file_stats = ma.Nested(CommentSchema(many=True))
+    raw_file_stats = ma.Nested(CommentSchema, many=True)
 
 class ResultTopicSchema(ModelSchema):
-    topic_id = ma.Integer()
-    topic_words = ma.List(ma.String())
-    positive = ma.List(ma.String())
-    neutral  = ma.List(ma.String())
-    negative = ma.List(ma.String())
+    words = ma.List(ma.String())
+    comments = ma.Nested(CommentSentimentSchema)
 
 class ResultInstructorSchema(ModelSchema):
-    course_sect = ma.String()
-    instr_first = ma.String()
-    instr_last  = ma.String()
-    positive = ma.List(ma.String())
-    neutral  = ma.List(ma.String())
-    negative = ma.List(ma.String())
+    instructor_first = ma.String()
+    instructor_last  = ma.String()
+    course_num_sect_id = ma.String()
+    comments = ma.Nested(CommentSentimentSchema)
 
 class ResultSchema(ModelSchema):
-    meta = ma.Nested(MetaSchema)
-    topic_stats = ma.Nested(ResultTopicSchema(many=True))
-    instructor_stats = ma.Nested(ResultInstructorSchema(many=True))
+    result_id = ma.Integer()
+    meta_file_info = ma.Nested(MetaSchema)
+    results = {}
+    results['topic_stats'] = ma.Nested(ResultTopicSchema, many=True)
+    results['instructor_stats'] = ma.Nested(ResultInstructorSchema, many=True)
 
