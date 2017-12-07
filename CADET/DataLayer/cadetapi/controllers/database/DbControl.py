@@ -419,7 +419,7 @@ class DbResult():
             ).first()
 
         if result is None:
-            print("result set id " + pk + " does not exist")
+            print("result set id " + str(pk) + " does not exist")
             return False
 
         dsid = result.dataset_id

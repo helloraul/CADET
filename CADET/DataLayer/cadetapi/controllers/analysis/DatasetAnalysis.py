@@ -1,8 +1,8 @@
 from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 from cadetapi.controllers.rest.ApiComment import CommentApi
-from cadetapi.controllers.database.DbControl import DbResult
 from cadetapi.controllers.database.DbControl import DbStopword
+from cadetapi.controllers.database.DbControl import DbResult
 
 class DatasetAnalysis():
 
@@ -57,6 +57,81 @@ class DatasetAnalysis():
         self.instructor_sentiment_histogram = self.Analyzer.getInstructorSentimentHistogram()
         self.instructorCommentList = self.Analyzer.getInstructorComments()
         self.hasFinishedLoad = True
+        self.formatCourseCommentResults()
+        self.formatInstructorCommentResults()
+        self.results = {
+                'topics_stats':self.topic_results,
+                'instructor_stats':self.instructor_results
+                }
+
+
+        
+    def formatCourseCommentResults(self):
+        data = []
+        for comment in self.courseCommentList:
+            data.append([comment.getTopicModelId(), comment.getSentiment(), comment.getCommentId()])
+        data.sort(key=lambda x: x[0])
+
+        topics_stats = []
+        for comment in data:
+            if len(topics_stats) <= comment[0]:
+                topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
+            topics_stats[comment[0]]['comments'][comment[1]].append(comment[2])
+
+        for topic_id in self.topic_model.keys():
+            if len(topics_stats) <= topic_id:
+                topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
+            topics_stats[topic_id]['topic_words'].extend(self.topic_model[topic_id])
+        self.topic_results = topics_stats
+        
+
+    # **************************************************
+    # *********                            *************
+    # ********* FIX THIS TERRIBLE FUNCTION *************
+    # *********                            *************
+    # **************************************************
+    def formatInstructorCommentResults(self):
+        instructor_stats = []
+
+        for comment in self.instructorCommentList:
+            fname, lname = comment.getInstructor()
+            for index, x in enumerate(instructor_stats):
+                if fname == instructor_stats[index]['instructor_first_name'] and lname == instructor_stats[index]['instructor_last_name']:
+                    instructor_stats[index]['comments'][comment.getSentiment()].append(comment.getCommentId())
+                    break
+                elif index == len(instructor_stats):
+                    instructor_stats.append({
+                        'instructor_first_name':fname,
+                        'instructor_last_name':lname,
+                        'course_num_sect_id':comment.getCourse(),
+                        'comments':{
+                            'positive':[],
+                            'negative':[],
+                            'neutral':[]
+                            }})
+                    instructor_stats[index+1]['comments'][comment.getSentiment()].append(comment.getCommentId())
+            if not instructor_stats:
+                instructor_stats.append({
+                    'instructor_first_name':fname,
+                    'instructor_last_name':lname,
+                    'course_num_sect_id':comment.getCourse(),
+                    'comments':{
+                        'positive':[],
+                        'negative':[],
+                        'neutral':[]
+                        }})
+                instructor_stats[0]['comments'][comment.getSentiment()].append(comment.getCommentId())
+
+        self.instructor_results = instructor_stats
+
+    def getResults(self):
+        return self.results
+
+    def getInstructorResults(self):
+        return self.instructor_results
+
+    def getTopicResults(self):
+        return self.topic_results
 
     def getCourseCommentList(self):
         return self.courseCommentList

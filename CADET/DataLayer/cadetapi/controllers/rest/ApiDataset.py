@@ -25,7 +25,7 @@ class DatasetApi(Resource):
         if (result):
             return result
         else:
-            return result, 204z
+            return result, 204
 
     def post(self):
         # Receive single comment as json object (primarily for unit testing)
@@ -33,7 +33,7 @@ class DatasetApi(Resource):
         recordValidate = DatasetAnalysis()
         req = request.get_json()
         meta = req['meta_file_info']
-      
+
         pk = record.GetId(
                 req['raw_file_stats'],
                 meta['user_selected_number_topics'],
@@ -43,10 +43,8 @@ class DatasetApi(Resource):
         response = {}
         response['resultset_id'] = pk
 
-"""""
- a call to analyze api
-"""""
-        if (record.Query(pk)= false) 
+# a call to analyze api
+        if (record.Query(pk)== false): 
            recordValidate.runAnalysis(pk)
         return response
 
