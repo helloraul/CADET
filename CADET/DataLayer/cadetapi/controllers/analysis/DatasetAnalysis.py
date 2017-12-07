@@ -69,14 +69,14 @@ class DatasetAnalysis():
     def formatCourseCommentResults(self):
         data = []
         for comment in self.courseCommentList:
-            data.append([comment.getTopicModelId(), comment.getSentiment(), comment.getCommentId()])
-        data.sort(key=lambda x: x[0])
+            data.append({'topic_id': comment.getTopicModelId(), 'sentiment': comment.getSentiment(), 'comment_id': comment.getCommentId()})
+        data.sort(key=lambda x: x['topic_id'])
 
         topics_stats = []
         for comment in data:
-            if len(topics_stats) <= comment[0]:
+            if len(topics_stats) <= comment['topic_id']:
                 topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
-            topics_stats[comment[0]]['comments'][comment[1]].append(comment[2])
+            topics_stats[comment['topic_id']]['comments'][comment['sentiment']].append(comment['comment_id'])
 
         for topic_id in self.topic_model.keys():
             if len(topics_stats) <= topic_id:
