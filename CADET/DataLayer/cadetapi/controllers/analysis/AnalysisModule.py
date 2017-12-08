@@ -87,7 +87,8 @@ class AnalysisModule():
     def updateAttributes(self):
         course_sentiments = self.qList.recv()
         for comment_object in self.courseCommentList:
-            comment_object.setSentiment(course_sentiments[comment_object.getCommentId()])
+            sentiment = course_sentiments[comment_object.comment_id]
+            comment_object.__setattr__('sentiment', sentiment)
         self.sentiment_process.join()
         self.sentiment_process.terminate()
 
@@ -98,7 +99,8 @@ class AnalysisModule():
         instructor_sentiments = data[0]
         self.instructor_sentiment_histogram = data[1]
         for comment_object in self.instructorCommentList:
-            comment_object.setSentiment(instructor_sentiments[comment_object.getCommentId()])
+            sentiment = instructor_sentiments[comment_object.comment_id]
+            comment_object.__setattr__('sentiment', sentiment)
         self.instructor_process.join()
         self.instructor_process.terminate()
 
@@ -171,9 +173,8 @@ class AnalysisModule():
                     count_similarities = temp_count
                     topic_id = i 
                             
-            self.courseCommentList[indexer].setTopicModelId(topic_id)
-
-            sentiment = comment_object.getSentiment()
+            self.courseCommentList[indexer].__setattr__('topic_model_id', topic_id)
+            sentiment = comment_object.sentiment
             if(sentiment == 'positive'):
                 self.topic_sentiment_histogram.get(topic_id)[0] += 1 
             elif(sentiment == 'negative'):
@@ -217,8 +218,8 @@ class AnalysisModule():
                 # create a dictionary mapping comments to their intended instructor
                 # instructor_name: {'comment': instructor_comment, 'comment_id': comment_id}
                 name = comment_object.instructor_first_name + ' ' + comment_object.instructor_last_name
-                comment_dict = {'comment':comment_object.getComment(),
-                                 'id':comment_object.getCommentId()}
+                comment_dict = {'comment':comment_object.comment,
+                                 'id':comment_object.comment_id}
                 if name in self.instructor_comments_dict:
                     self.instructor_comments_dict.get(name).append(comment_dict)
                 else:
