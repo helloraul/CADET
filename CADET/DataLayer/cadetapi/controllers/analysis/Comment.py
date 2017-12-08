@@ -32,7 +32,7 @@ class Comment():
 
     def convertFromCommentDict(self, comment_dict):
         if 'anon_id' in comment_dict: self.anon_id = comment_dict['anon_id']
-        if 'comment' in comment_dict: self.comment = comment_dict['comment']
+        if 'comment' in comment_dict: self.comment = str(comment_dict['comment']) # ensure that comment is a string
         if 'comment_id' in comment_dict: self.comment_id = comment_dict['comment_id']
         if 'comment_type' in comment_dict: self.comment_type = comment_dict['comment_type']
         if 'course_num_sect_id' in comment_dict: self.course_num_sect_id = comment_dict['course_num_sect_id']
@@ -40,7 +40,7 @@ class Comment():
         if 'instructor_last_name' in comment_dict: self.instructor_last_name = comment_dict['instructor_last_name']
         if 'sentiment' in comment_dict: self.sentiment = comment_dict['sentiment']
         if 'topic_model_id' in comment_dict: self.topic_model_id = comment_dict['topic_model_id']
-        if 'course' in comment_dict: self.course_modality = comment_dict['course']
+        if 'course_modality' in comment_dict: self.course_modality = comment_dict['course_modality']
 
     def convertToCommentDict(self):
         return {
