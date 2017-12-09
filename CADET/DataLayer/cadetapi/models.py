@@ -112,11 +112,3 @@ class ResultInstructorComment(Base):
 
 def DbSession():
     return db.session
-    #engine = CadEngine()
-    #Base.metadata.bind = engine
-    #sess = db.sessionmaker(bind=engine)
-    #return sess()
-
-# Create all tables in the engine. This is equivalent to "Create Table"
-# statements in raw SQL.
-#Base.metadata.create_all(CadEngine())
