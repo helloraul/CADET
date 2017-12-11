@@ -78,7 +78,10 @@ class DatasetAnalysis():
         for comment in data:
             if len(topics_stats) <= comment['topic_id']:
                 topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
-            topics_stats[comment['topic_id']]['comments'][comment['sentiment']].append(comment['comment_id'])
+            # print("Topic ID %s" % comment['topic_id'])
+            # print("Comment ID %s" % comment['comment_id'])
+            if (comment['topic_id'] != -1):
+                topics_stats[comment['topic_id']]['comments'][comment['sentiment']].append(comment['comment_id'])
 
         for topic_id in self.topic_model.keys():
             if len(topics_stats) <= topic_id:

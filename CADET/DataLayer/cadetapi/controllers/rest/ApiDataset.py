@@ -21,12 +21,13 @@ class DatasetApi(Resource):
                 meta['user_selected_words_per_topic'],
                 meta['user_selected_number_iterations'],
             )
+        recordValidate = DatasetAnalysis(pk)
         response = {}
 
         response['resultset_id'] = pk
 
-        if (record.Query(pk)==false):
-            recordValidate.runAnalysis(pk)
+        if (record.Query(pk)==False):
+            recordValidate.runAnalysis()
 
         return response
 
