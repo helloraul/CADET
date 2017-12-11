@@ -7,7 +7,7 @@ from flask import abort
 from flask_restful import Resource, request
 from cadetapi.models import ResultSet
 from cadetapi.controllers.database.DbControl import DbResult
-from cadetapi.controllers.analysis.DatasetAnalysis import DataSetAnalysis
+from cadetapi.controllers.analysis.DatasetAnalysis import DatasetAnalysis
 
 class DatasetApi(Resource):
     def post(self):
@@ -25,14 +25,13 @@ class DatasetApi(Resource):
 
         response['resultset_id'] = pk
 
-	
+        if (record.Query(pk)==false):
+            recordValidate.runAnalysis(pk)
+
         return response
 
 
 """""
  a call to analyze api
-       if (record.Query(pk)==false)
-           recordValidate.runAnalysis(pk)
-        return response
 """""
  
