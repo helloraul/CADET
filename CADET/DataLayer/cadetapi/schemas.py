@@ -60,10 +60,11 @@ class ResultInstructorSchema(ModelSchema):
     course_num_sect_id = ma.String()
     comments = ma.Nested(CommentSentimentSchema)
 
+class ResultResultsSchema(ModelSchema):
+    topics_stats = ma.Nested(ResultTopicSchema, many=True)
+    instructor_stats = ma.Nested(ResultInstructorSchema, many=True)
+
 class ResultSchema(ModelSchema):
     result_id = ma.Integer()
     meta_file_info = ma.Nested(MetaSchema)
-    results = {}
-    results['topic_stats'] = ma.Nested(ResultTopicSchema, many=True)
-    results['instructor_stats'] = ma.Nested(ResultInstructorSchema, many=True)
-
+    results = ma.Nested(ResultResultsSchema)
