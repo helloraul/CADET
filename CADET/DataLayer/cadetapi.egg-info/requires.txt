@@ -1,5 +1,0 @@
-flask
-flask-marshmallow
-flask-restful
-flask-sqlalchemy
-marshmallow-sqlalchemy
