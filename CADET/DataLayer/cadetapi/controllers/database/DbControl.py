@@ -1,9 +1,5 @@
-#from sqlalchemy import *
-#from sqlalchemy.orm import *
- 
 from cadetapi.models import *
-#import Comment as OrigCom
- 
+
 class DbInstructor():
     pk = 0
     lname = ''
@@ -11,7 +7,7 @@ class DbInstructor():
 
 
     def GetId(self, fname, lname):
-        if self.pk != 0 and self.fname==fname and self.lname==lname: 
+        if self.pk != 0 and self.fname==fname and self.lname==lname:
             # the primary key is already set, just return it
             return self.pk
         else: # need to fetch the record from the database
@@ -85,7 +81,7 @@ class DbCourse():
     program = ''
     modality = 0
     num_sec = ''
-    
+
     def GetId(self, program, modality, num_sec):
         if (self.pk != 0 and \
             self.program==program and \
@@ -123,7 +119,7 @@ class DbCourse():
             self.pk = course.id
         return self.pk
 
-    def GetCourse(self, pk):    
+    def GetCourse(self, pk):
         if self.pk == pk:
             return (self.program, self.modality, self.num_sec)
         else:
@@ -172,11 +168,15 @@ class DbComment():
         self.__clear_comment()
         #self.comment = {**self.comment, **comm} # python >= 3.5
         self.comment.update(comm)
-        self.course_id = self.course.GetId(self.comment['program'],
-                                           self.comment['modality'],
-                                           self.comment['course_num_sect_id'])
-        self.instructor_id = self.instr.GetId(self.comment['instructor_first_name'],
-                                              self.comment['instructor_last_name'])
+        self.course_id = self.course.GetId(
+            self.comment['program'],
+            self.comment['modality'],
+            self.comment['course_num_sect_id'],
+        )
+        self.instructor_id = self.instr.GetId(
+            self.comment['instructor_first_name'],
+            self.comment['instructor_last_name'],
+        )
         self.anon_id = self.comment['anon_id']
 
         # PutComment returns comment ID
@@ -284,7 +284,7 @@ class DbComment():
         self.course = DbCourse()
         self.instr = DbInstructor()
         self.__clear_comment()
-        
+
 
 class DbDataset():
     pk = 0
@@ -296,14 +296,14 @@ class DbDataset():
         # Identify if data already exists
         # Insert if data does not already exist
         # Return primary key identifier
-        
+
         # reset (clear) existing comment_keys
         del self.comment_keys[:]
         #iterate through each comment, collecting IDs as we go
         for SingleComment in dataset:
             newId = self.comment.GetId(SingleComment)
             self.comment_keys.append(newId)
-        
+
         # then see if there is already a dataset of these particular IDs
         # I want to check if an existing dataset contains exactly these IDs
 
@@ -332,39 +332,28 @@ class DbDataset():
                         comment_id = SingleId,
                         dataset_id = self.pk)
                 self.sess.add(newDataset)
-            
+
             self.sess.flush()
             self.sess.commit()
         else:
             self.pk = result.dataset_id
-        
-        
-
 
         return self.pk
 
-    def GetDataset(self, pk):
+    def Query(self, pk):
         # Fetch existing dataset based on primary key
-        session = self.sess
-        self.pk = pk
-
-        # If there is an existing comment, check for that
-        result = session.query(CommentDataSet.comment_id).filter(
-            CommentDataSet.dataset_id == self.pk
+        # If there is an existing dataset, check for that
+        result = self.sess.query(CommentDataSet.comment_id).filter(
+            CommentDataSet.dataset_id == pk
             ).all()
+        response = []
+        for comment_id in result:
+            # Re-initialize the comment object each time,
+            # or else we'll just overwrite by reference
+            newComment = DbComment()
+            response.append(newComment.GetComment(comment_id[0]))
 
-        if not result:
-            # Primary Key not found in database
-            return False
-        else:
-            del self.comments[:]
-            for comment_id in result:
-                # Re-initialize the comment object each time,
-                # or else we'll just overwrite by reference
-                newComment = DbComment()
-                self.comments.append(newComment.GetComment(comment_id[0]))
-            
-            return self.comments
+        return response
 
     def __init__(self):
         self.sess = DbSession()
@@ -376,10 +365,10 @@ class DbStopword():
         response = []
         query = self.sess.query(Stopword.stop_word)
         result = query.all()
-        
+
         for word in result:
             response.append(word.stop_word)
-            
+
         return response
 
     def InsertWord(self, word):
@@ -398,7 +387,7 @@ class DbStopword():
                 #self.sess.flush()
 
         self.sess.commit()
-        
+
         # Return all stopwords
         return self.Query()
 
@@ -421,7 +410,7 @@ class DbResult():
         # first check to make sure we don't already have something
         exists = self.Query(pk)
         if exists:
-            print('Cannot insert analysis, analysis has already been performed')
+            print('Cannot insert analysis, analysis already performed')
             return True #not positive this should be the return value
 
         # Fetch the dataset id, which we will need later
@@ -430,7 +419,7 @@ class DbResult():
             ).first()
 
         if result is None:
-            print("result set id " + pk + " does not exist")
+            print("result set id " + str(pk) + " does not exist")
             return False
 
         dsid = result.dataset_id
@@ -460,11 +449,15 @@ class DbResult():
         self.sess.add(new_record)
         self.sess.flush()
         topic_pk = new_record.id
-        
+
         # Store the Comment Sentiments
         for topic_sent in topic['comments']: #positive, neutral, negative
-            for topic_comment in topic['comments'][topic_sent]:
-                success = self.__StoreCourseComment(topic_pk, topic_comment, topic_sent)
+            for comment_pk in topic['comments'][topic_sent]:
+                success = self.__StoreCourseComment(
+                    topic_pk,
+                    comment_pk,
+                    topic_sent,
+                )
                 if not success:
                     print('Failed to store topic sentiments')
                     return False
@@ -476,53 +469,28 @@ class DbResult():
                 word = topic_word,
             )
             self.sess.add(new_record)
-        
+
         self.sess.flush()
         return True
 
-    def __StoreCourseComment(self, topic_pk, topic_comment, topic_sent):
-        # topic_comment is the actual string text of the comment
-        # what we need is the pk from the comments table
-        # we need to find the right one, based on the dataset that was analyzed
-        # it could even be more than one (identical words), in which case
-        # we'll store both (all)
-        query = self.sess.query(Comment.id).filter(db.and_(
-                Comment.c_com == topic_comment,
-                ResultTopic.id == topic_pk,
-            ))
-        query = query.join(CommentDataSet)
-        query = query.join(DataSet)
-        query = query.join(ResultSet)
-        query = query.join(ResultTopic)
-        result = query.all()
-
-        if result is None:
-            print('could not find comment id for: ' + topic_comment)
-            return False
-
-        for comment_pk in result:
-            new_record = ResultCourseComment(
-                    topic_id = topic_pk,
-                    comment_id = comment_pk.id,
-                    course_com_sent = topic_sent,
-                )
-            self.sess.add(new_record)
-            
+    def __StoreCourseComment(self, topic_pk, comment_pk, topic_sent):
+        new_record = ResultCourseComment(
+                topic_id = topic_pk,
+                comment_id = comment_pk,
+                course_com_sent = topic_sent,
+            )
+        self.sess.add(new_record)
         self.sess.flush()
-
         return True
 
     def __StoreInstr(self, result_pk, instr):
         # Store the Comment Sentiments
         for inst_sent in instr['comments']: #positive, neutral, negative
-            for inst_comment in instr['comments'][inst_sent]:
+            for comment_pk in instr['comments'][inst_sent]:
                 success = self.__StoreInstrComment(
-                                    result_pk, 
-                                    inst_comment, 
-                                    inst_sent, 
-                                    instr['course_num_sect_id'], 
-                                    instr['instructor_last_name'], 
-                                    instr['instructor_first_name'],
+                                    result_pk,
+                                    comment_pk,
+                                    inst_sent,
                                 )
                 if not success:
                     print('Failed to store instructor comment')
@@ -530,41 +498,14 @@ class DbResult():
 
         return True
 
-    def __StoreInstrComment(self, result_pk, inst_comment, inst_sent, 
-                            num_sec, i_last, i_first):
-        # topic_comment is the actual string text of the comment
-        # what we need is the pk from the comments table
-        # we need to find the right one, based on the dataset that was analyzed
-        # it could even be more than one (identical words), in which case
-        # we'll store both, but we'll also deduplicate as we go
-        query = self.sess.query(Comment.id).filter(db.and_(
-                Comment.i_com == inst_comment,
-                ResultSet.id == result_pk,
-                Instructor.last_name == i_last,
-                Instructor.first_name == i_first,
-                Course.num_sec == num_sec,
-            ))
-        query = query.join(Instructor)
-        query = query.join(Course)
-        query = query.join(CommentDataSet)
-        query = query.join(DataSet)
-        query = query.join(ResultSet)
-        result = query.all()
-
-        if result is None:
-            print('Could not find comment id for inst comment: ' + inst_comment)
-            return False
-
-        for comment_pk in result:
-            new_record = ResultInstructorComment(
-                    result_id = result_pk,
-                    comment_id = comment_pk.id,
-                    instr_com_sent = inst_sent,
-                )
-            self.sess.add(new_record)
-            
+    def __StoreInstrComment(self, result_pk, comment_pk, inst_sent):
+        new_record = ResultInstructorComment(
+                result_id = result_pk,
+                comment_id = comment_pk,
+                instr_com_sent = inst_sent,
+            )
+        self.sess.add(new_record)
         self.sess.flush()
-
         return True
 
     def GetId(self, comments, topics, words, num_it):
@@ -576,7 +517,7 @@ class DbResult():
         sw = DbStopword()
         stop_word_list = sw.FullList()
         stop_word_string = ' '.join(stop_word_list)
-        
+
         # If there is an existing dataset, check for that
         result = self.sess.query(ResultSet).filter(db.and_(
             ResultSet.dataset_id == dsid,
@@ -642,14 +583,16 @@ class DbResult():
             topic['words'] = []
             #fetch comments
             query = self.sess.query(
-                    Comment.c_com, 
+                    Comment.c_com,
                     ResultCourseComment.course_com_sent,
                 )
             query = query.filter(ResultCourseComment.topic_id == row.id)
             query = query.join(ResultCourseComment)
             topic_result = query.all()
             for comment in topic_result:
-                topic['comments'][comment.course_com_sent].append(comment.c_com)
+                topic['comments'][comment.course_com_sent].append(
+                    comment.c_com
+                )
 
             #fetch words
             query = self.sess.query(TopicWord)
@@ -706,7 +649,7 @@ class DbResult():
 
             instcom['comments'] = comlist
             response['results']['instructor_stats'].append(instcom)
-        
+
         return response
 
     def GetCommentIDs(self, result_id):

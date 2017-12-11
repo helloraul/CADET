@@ -13,8 +13,8 @@ ma=Marshmallow()
 
 class CommentSchema(ModelSchema):
     anon_id = field_for(Comment, 'anon_id', dump_only=True)
-    course_program = field_for(Course, 'program', dump_only=True)
-    course_modality = field_for(Course, 'modality', dump_only=True)
+    program = field_for(Course, 'program', dump_only=True)
+    modality = field_for(Course, 'modality', dump_only=True)
     course_num_sect_id = field_for(Course, 'num_sec', dump_only=True)
     instructor_first_name = field_for(Instructor, 'first_name', dump_only=True)
     instructor_last_name = field_for(Instructor, 'last_name', dump_only=True)
@@ -35,31 +35,36 @@ class StopwordSchema(ModelSchema):
     word_id = field_for(Stopword, 'id', dump_only=True)
     stop_word = field_for(Stopword, 'stop_word', dump_only=True)
 
-class DatasetSchema(ModelSchema):
-    stub = 'need to do this'
-
 class MetaSchema(ModelSchema):
-    doc_id = ma.Integer()
-    topics = ma.Integer()
-    iterations = ma.Integer()
-    words_per_topic = ma.Integer()
+    document_id_number = ma.Integer(dump_only=True)
+    user_selected_number_topics = ma.Integer()
+    user_selected_number_iterations = ma.Integer()
+    user_selected_words_per_topic = ma.Integer()
 
-class TopicSchema(ModelSchema):
-    topic_id = ma.Integer()
-    topic_words = ma.List(ma.String())
+class CommentSentimentSchema(ModelSchema):
     positive = ma.List(ma.String())
-    neutral  = ma.List(ma.String())
+    neutral = ma.List(ma.String())
     negative = ma.List(ma.String())
 
-class RatingSchema(ModelSchema):
-    course_sect = ma.String()
-    instr_first = ma.String()
-    instr_last  = ma.String()
-    positive = ma.List(ma.String())
-    neutral  = ma.List(ma.String())
-    negative = ma.List(ma.String())
+class DatasetSchema(ModelSchema):
+    meta_file_info = ma.Nested(MetaSchema)
+    raw_file_stats = ma.Nested(CommentSchema, many=True)
+
+class ResultTopicSchema(ModelSchema):
+    words = ma.List(ma.String())
+    comments = ma.Nested(CommentSentimentSchema)
+
+class ResultInstructorSchema(ModelSchema):
+    instructor_first = ma.String()
+    instructor_last  = ma.String()
+    course_num_sect_id = ma.String()
+    comments = ma.Nested(CommentSentimentSchema)
+
+class ResultResultsSchema(ModelSchema):
+    topics_stats = ma.Nested(ResultTopicSchema, many=True)
+    instructor_stats = ma.Nested(ResultInstructorSchema, many=True)
 
 class ResultSchema(ModelSchema):
-    meta = ma.Nested(MetaSchema)
-    topic_stats = ma.Nested(TopicSchema(many=True))
-    instructor_stats = ma.Nested(RatingSchema(many=True))
+    result_id = ma.Integer()
+    meta_file_info = ma.Nested(MetaSchema)
+    results = ma.Nested(ResultResultsSchema)

@@ -70,6 +70,12 @@ rest_api.add_resource(
     )
 
 rest_api.add_resource(
+    DatasetApi,                       # name of class handling requests
+    '/api/AddDataset',                # url to post request
+    endpoint='adddataset'             # Flask name of API endpoint
+    )
+
+rest_api.add_resource(
     TestDataset,                      # name of class handling requests
     '/test/Dataset',                  # url to post request
     endpoint='testds'                 # Flask name of API endpoint

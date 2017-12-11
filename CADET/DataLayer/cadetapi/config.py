@@ -28,6 +28,7 @@ class TestConfig(Config):
     DEBUG = True
     DEBUG_TB_ENABLED = False
 
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:////' + db_file.name
 
 class MysqlConfig(Config):

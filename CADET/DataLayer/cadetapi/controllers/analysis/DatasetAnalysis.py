@@ -1,7 +1,7 @@
 from cadetapi.controllers.analysis.AnalysisModule import AnalysisModule as Analyzer
-from cadetapi.controllers.rest.ApiStopword import StopwordApi
 from cadetapi.controllers.analysis.Comment import Comment as CommentObject
 from cadetapi.controllers.rest.ApiComment import CommentApi
+from cadetapi.controllers.database.DbControl import DbStopword
 from cadetapi.controllers.database.DbControl import DbResult
 
 class DatasetAnalysis():
@@ -44,11 +44,8 @@ class DatasetAnalysis():
         self.getCommentObjects()
         
         # get stop words from database
-        stop_words = list()
-        for item in StopwordApi().get():
-            stop_words.append(item['stop_word'])
-        
-        # stop_words = DbStopword().FullList()
+        stop_words = DbStopword().FullList()
+
         self.Analyzer = Analyzer(self.comments, stop_words, self.num_topics, self.words_per_topic, self.iterations)
 
         self.Analyzer.runAnalysis() # This will take time !!!!
@@ -60,6 +57,69 @@ class DatasetAnalysis():
         self.instructor_sentiment_histogram = self.Analyzer.getInstructorSentimentHistogram()
         self.instructorCommentList = self.Analyzer.getInstructorComments()
         self.hasFinishedLoad = True
+        self.formatCourseCommentResults()
+        self.formatInstructorCommentResults()
+        self.results = {
+            'topics_stats':self.topic_results,
+            'instructor_stats':self.instructor_results
+        }
+
+        DbResult().StoreAnalysis(self.result_set_id, self.results)
+
+
+        
+    def formatCourseCommentResults(self):
+        data = []
+        for comment in self.courseCommentList:
+            data.append({'topic_id': comment.topic_model_id, 'sentiment': comment.sentiment, 'comment_id': comment.comment_id})
+        data.sort(key=lambda x: x['topic_id'])
+
+        topics_stats = []
+        for comment in data:
+            if len(topics_stats) <= comment['topic_id']:
+                topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
+            # print("Topic ID %s" % comment['topic_id'])
+            # print("Comment ID %s" % comment['comment_id'])
+            if (comment['topic_id'] != -1):
+                topics_stats[comment['topic_id']]['comments'][comment['sentiment']].append(comment['comment_id'])
+
+        for topic_id in self.topic_model.keys():
+            if len(topics_stats) <= topic_id:
+                topics_stats.append({'comments': {'positive':[], 'negative':[], 'neutral':[]}, 'topic_words':[]})
+            topics_stats[topic_id]['topic_words'].extend(self.topic_model[topic_id])
+        self.topic_results = topics_stats
+
+    def formatInstructorCommentResults(self):
+        instructor_stats = []
+        for instructor in self.instructor_sentiment_histogram.keys():
+            instructor_stats.append({
+                'comments': {
+                    'positive':[],
+                    'negative':[],
+                    'neutral':[]
+                },
+                'instructor_first_name':instructor.split(', ')[1],
+                'instructor_last_name':instructor.split(',')[0]
+            })
+        
+        for comment in self.instructorCommentList:
+            fname = comment.instructor_first_name
+            lname = comment.instructor_last_name
+            for index, x in enumerate(instructor_stats):
+                if fname == instructor_stats[index]['instructor_first_name'] and lname == instructor_stats[index]['instructor_last_name']:
+                    instructor_stats[index]['comments'][comment.sentiment].append(comment.comment_id)
+                    if 'course_num_sect_id' not in instructor_stats[index].keys():
+                        instructor_stats[index]['course_num_sect_id'] = comment.course_num_sect_id
+        self.instructor_results = instructor_stats
+
+    def getResults(self):
+        return self.results
+
+    def getInstructorResults(self):
+        return self.instructor_results
+
+    def getTopicResults(self):
+        return self.topic_results
 
     def getCourseCommentList(self):
         return self.courseCommentList

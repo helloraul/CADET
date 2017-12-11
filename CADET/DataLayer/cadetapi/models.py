@@ -60,7 +60,7 @@ class DataSet(Base):
 
 class CommentDataSet(Base):
     # Define columns and relationships for the 'com_dat' table
-    # This table maintains the many-to-many relationship between comments and datasets
+    # Table maintains the many-to-many relationship for comments and datasets
     __tablename__ = 'com_dat'
     id = db.Column(db.Integer, primary_key=True)
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
@@ -75,7 +75,7 @@ class ResultSet(Base):
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
     topic_cnt = db.Column(db.Integer) # number of topics
     word_cnt = db.Column(db.Integer)  # words per topic
-    stop_words = db.Column(db.String(1000)) # concatenated list of stop-words used
+    stop_words = db.Column(db.String(1000)) # concatenated list of stop-words
     iterations = db.Column(db.Integer) # number of iterations
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -112,11 +112,3 @@ class ResultInstructorComment(Base):
 
 def DbSession():
     return db.session
-    #engine = CadEngine()
-    #Base.metadata.bind = engine
-    #sess = db.sessionmaker(bind=engine)
-    #return sess()
-
-# Create all tables in the engine. This is equivalent to "Create Table"
-# statements in raw SQL.
-#Base.metadata.create_all(CadEngine())

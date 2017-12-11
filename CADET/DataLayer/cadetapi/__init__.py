@@ -5,7 +5,7 @@
 """
 
 from flask import Flask, redirect, url_for
-from .config import DevConfig, MysqlConfig
+from .config import DevConfig, MysqlConfig, TestConfig
 
 from .models import db
 from .schemas import ma
@@ -14,6 +14,7 @@ from .urls import rest_api
 # create app using a config
 app = Flask(__name__)
 app.config.from_object(DevConfig)
+#app.config.from_object(TestConfig)
 #app.config.from_object(MysqlConfig)
 
 # link sqlalchemy db to the app
