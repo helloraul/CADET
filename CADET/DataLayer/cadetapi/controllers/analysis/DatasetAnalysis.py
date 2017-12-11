@@ -64,6 +64,8 @@ class DatasetAnalysis():
             'instructor_stats':self.instructor_results
         }
 
+        DbResult().StoreAnalysis(self.result_set_id, self.results)
+
 
         
     def formatCourseCommentResults(self):
