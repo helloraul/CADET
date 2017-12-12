@@ -83,8 +83,9 @@ class TestSchemas(unittest.TestCase):
         assert 'document_id_number' in temp['meta_file_info']
         assert 'user_selected_words_per_topic' in temp['meta_file_info']
         results = temp['results']
-        assert 'topic_stats' in temp['results']
-        topiclist = results['topic_stats']
+        print(temp)
+        assert 'topics_stats' in temp['results']
+        topiclist = results['topics_stats']
         for topic in topiclist:
             assert 'words' in topic
             assert 'comments' in topic

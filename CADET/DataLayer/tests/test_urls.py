@@ -1,6 +1,8 @@
 """Make sure the TestConfig is being used in __init__.py"""
 
 import os
+from test_vectors import *
+from cadetapi.schemas import *
 import cadetapi
 import unittest
 import json
@@ -9,75 +11,22 @@ import json
 def isStringIn(s, obj):
     return bytes(s, encoding='utf8') in obj
 
+
+def post_comment(client):
+    senddata = CommentSchema().dump(CommentExample1).data
+    return client.post('/api/Comment', data=senddata, content_type='application/json')
+
+
+def post_dataset(client):
+    senddata = DatasetSchema().dump(DatasetExample).data
+    print(senddata)
+    return client.post('/api/Dataset/', data=senddata, content_type='application/json')
+
+
 class TestURLs(unittest.TestCase):
     def setUp(self):
         cadetapi.app.testing = True
         self.client = cadetapi.app.test_client()
-
-    # def tearDown(self):
-        # db_uri = cadetapi.app.config['SQLALCHEMY_DATABASE_URI']
-        # db_file = os.path.normpath(db_uri)[7:]
-        # print(db_file)
-        # os.remove(db_file)
-
-    def post_comment(self):
-        postdata = json.dumps(dict(
-            anon_id = "42", \
-            instructor_first_name = "Joe",      \
-            instructor_last_name = "Bennett",   \
-            course_program = "Engineering",     \
-            course_modality = "in-person",      \
-            course_num_sect_id = "605.423",     \
-            course_comments = "I like this class overall", \
-            instructor_comments = "The instructor did a good job of challenging the students", \
-            additional_comments = "The campus is in a really convenient location"))
-
-        return self.client.post('/api/Comment', data=postdata, content_type='application/json')
-
-    def post_dataset(self):
-        postdata = json.dumps(dict(
-            meta_file_info = dict(
-                document_id_number = "3",
-                user_selected_words_per_topic = "5",
-                user_selected_number_topics = "4",
-                user_selected_number_iterations = "30"
-            ),
-        raw_file_stats = [
-            dict(
-                anon_id = "12",
-                program = "Computer Science",
-                modality = "classroom",
-                course_num_sect_id = "604.211",
-                instructor_last_name = "Coffman",
-                instructor_first_name = "Joel",
-                course_comments = "course comment 1",
-                instructor_comments = "instructor comment 1",
-                additional_comments = "additional comment 1"
-            ),
-            dict(
-                anon_id = "23",
-                program = "Computer Science",
-                modality = "classroom",
-                course_num_sect_id = "604.211",
-                instructor_last_name = "Coffman",
-                instructor_first_name = "Joel",
-                course_comments = "course comment 2",
-                instructor_comments = "instructor comment 2",
-                additional_comments = "additional comment 2"
-            ),
-            dict(
-                anon_id = "42",
-                program = "Computer Science",
-                modality = "classroom",
-                course_num_sect_id = "604.211",
-                instructor_last_name = "Coffman",
-                instructor_first_name = "Joel",
-                course_comments = "course comment 3",
-                instructor_comments = "instructor comment 3",
-                additional_comments = "additional comment 3"
-            )]))
-
-        return self.client.post('/api/Dataset/', data=postdata, content_type='application/json')
 
     def test_root_return(self):
         """Tests if the root URL gives Hello, World"""
@@ -101,7 +50,7 @@ class TestURLs(unittest.TestCase):
         assert result.status_code == 204 # expecting the element to not exist
         assert result.headers['Content-Type'] == "application/json"
         # post data to comment table
-        result = self.post_comment()
+        result = post_comment(self.client)
         assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
         assert isStringIn("comment_id", result.data)
@@ -124,18 +73,18 @@ class TestURLs(unittest.TestCase):
         """Tests the Dataset URL"""
         # check root dataset url
         result = self.client.get('/api/Dataset')
-        assert result.status_code == 204 # expecting the table to be empty
+        assert result.status_code == 405 # expecting error
         assert result.headers['Content-Type'] == "application/json"
         # check again with trailing slash
         result = self.client.get('/api/Dataset/')
-        assert result.status_code == 204 # expecting the table to be empty
+        assert result.status_code == 405 # expecting error
         assert result.headers['Content-Type'] == "application/json"
         # check element from Comment
         result = self.client.get('/api/Dataset/1')
         assert result.status_code == 204 # expecting the element to not exist
         assert result.headers['Content-Type'] == "application/json"
         # post data to comment table
-        result = self.post_dataset()
+        result = post_dataset(self.client)
         assert result.status_code == 201
         assert result.headers['Content-Type'] == "application/json"
         assert isStringIn("resultset_id", result.data)
@@ -156,21 +105,22 @@ class TestURLs(unittest.TestCase):
         assert "course_num_sect_id" in result.data
         assert "additional_comments" in result.data
 
-
-#    def test_result_return(self):
-#        """Tests the Result URL"""
-#        # check root result url
-#        result = self.client.get('/api/Result')
-#        assert result.status_code == 204 # expecting the table to be empty
-#        assert result.headers['Content-Type'] == "application/json"
-#        # check again with trailing slash
-#        result = self.client.get('/api/Result/')
-#        assert result.status_code == 204 # expecting the table to be empty
-#        assert result.headers['Content-Type'] == "application/json"
-#        # check element from Comment
-#        result = self.client.get('/api/Result/1')
-#        assert result.status_code == 204 # expecting the element to not exist
-#        assert result.headers['Content-Type'] == "application/json"
+    # code commented out for future enhancement and tests for comprhensive
+    # coverage of the application.
+   # def test_result_return(self):
+       # """Tests the Result URL"""
+       # # check root result url
+       # result = self.client.get('/api/Result')
+       # assert result.status_code == 204 # expecting the table to be empty
+       # assert result.headers['Content-Type'] == "application/json"
+       # # check again with trailing slash
+       # result = self.client.get('/api/Result/')
+       # assert result.status_code == 204 # expecting the table to be empty
+       # assert result.headers['Content-Type'] == "application/json"
+       # # check element from Comment
+       # result = self.client.get('/api/Result/1')
+       # assert result.status_code == 204 # expecting the element to not exist
+       # assert result.headers['Content-Type'] == "application/json"
 
 if __name__ == '__main__':
     unittest.main()

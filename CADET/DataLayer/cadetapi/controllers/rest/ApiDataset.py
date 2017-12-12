@@ -6,10 +6,30 @@
 from flask import abort
 from flask_restful import Resource, request
 from cadetapi.models import ResultSet
+from cadetapi.schemas import CommentSchema
 from cadetapi.controllers.database.DbControl import DbResult
+from cadetapi.controllers.database.DbControl import DbDataset
 from cadetapi.controllers.analysis.DatasetAnalysis import DatasetAnalysis
 
 class DatasetApi(Resource):
+    def get(self, dataset_id=None):
+        if (dataset_id is not None):
+            # Retrieve dataset from database
+            inst = DbDataset()
+            response = inst.Query(dataset_id)
+
+            # marshall dataset into dict
+            result = CommentSchema(many=True).dump(response).data
+
+            # return result dict and 204 code if empty
+            if (result):
+                return result
+            else:
+                return result, 204
+        else:
+            result = dict(error = "Method requires ID to be specified")
+            return result, 405
+
     def post(self):
         # Receive single comment as json object (primarily for unit testing
         record = DbResult()
@@ -30,9 +50,3 @@ class DatasetApi(Resource):
             recordValidate.runAnalysis()
 
         return response
-
-
-"""""
- a call to analyze api
-"""""
- 

@@ -91,8 +91,8 @@ class ResultExample():
     result_id = 1000
     meta_file_info = MetaExample1
     results = {}
-    results['topic_stats'] = []
-    results['topic_stats'].append(ResultTopicExample)
+    results['topics_stats'] = []
+    results['topics_stats'].append(ResultTopicExample)
     results['instructor_stats'] = []
     results['instructor_stats'].append(ResultInstructorExample)
 
