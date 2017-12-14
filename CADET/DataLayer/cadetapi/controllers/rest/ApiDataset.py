@@ -7,8 +7,8 @@ from flask import abort
 from flask_restful import Resource, request
 from cadetapi.models import ResultSet
 from cadetapi.schemas import CommentSchema
-from cadetapi.controllers.database.DbControl import DbResult
-from cadetapi.controllers.database.DbControl import DbDataset
+from cadetapi.controllers.database.DbResult import DbResult
+from cadetapi.controllers.database.DbDataset import DbDataset
 from cadetapi.controllers.analysis.DatasetAnalysis import DatasetAnalysis
 
 class DatasetApi(Resource):
@@ -33,7 +33,7 @@ class DatasetApi(Resource):
     def post(self):
         # Receive single comment as json object (primarily for unit testing
         record = DbResult()
-        req = request.get_json()
+        req = request.get_json(force=True)
         meta = req['meta_file_info']
         pk = record.GetId(
                 req['raw_file_stats'],
