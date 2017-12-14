@@ -7,8 +7,8 @@ from flask import abort
 from flask_restful import Resource, request
 from ...models import ResultSet
 from ...schemas import CommentSchema
-from ..database.DbResult import DbResult
-from ..database.DbDataset import DbDataset
+from ..database.DbControl import DbResult
+from ..database.DbControl import DbDataset
 from ..analysis.DatasetAnalysis import DatasetAnalysis
 
 class DatasetApi(Resource):
