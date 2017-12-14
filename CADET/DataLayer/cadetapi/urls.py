@@ -11,8 +11,6 @@ from .controllers.rest.ApiInstructor import InstructorApi
 from .controllers.rest.ApiDataset import DatasetApi
 from .controllers.rest.ApiResults import ResultApi
 from .controllers.rest.ApiStopword import StopwordApi
-from .controllers.rest.TestDataset import TestDataset
-from .controllers.rest.TestAnalysis import TestAnalysis
 
 rest_api = Api()
 
@@ -46,6 +44,7 @@ rest_api.add_resource(
 
 rest_api.add_resource(
     DatasetApi,                       # name of class handling requests
+    '/api/AddDataset',                # url to post request
     '/api/Dataset',                   # url to retrieve table
     '/api/Dataset/<int:dataset_id>',  # url to retrieve elements in table
     '/api/Dataset/',                  # alt url to retrieve table
@@ -67,23 +66,4 @@ rest_api.add_resource(
     '/api/Stopword',                  # url to retrieve table
     '/api/Stopword/<int:word_id>/',   # url to retrieve elements in table
     endpoint='stopword'                 # Flask name of API endpoint
-    )
-
-rest_api.add_resource(
-    DatasetApi,                       # name of class handling requests
-    '/api/AddDataset',                # url to post request
-    endpoint='adddataset'             # Flask name of API endpoint
-    )
-
-rest_api.add_resource(
-    TestDataset,                      # name of class handling requests
-    '/test/Dataset',                  # url to post request
-    endpoint='testds'                 # Flask name of API endpoint
-    )
-
-rest_api.add_resource(
-    TestAnalysis,                      # name of class handling requests
-    '/test/Analysis/<int:result_id>/', # url to retreive analysis
-    '/test/Analysis',                  # url to post request
-    endpoint='testan'                  # Flask name of API endpoint
     )

@@ -5,11 +5,11 @@
 
 from flask import abort
 from flask_restful import Resource, request
-from cadetapi.models import ResultSet
-from cadetapi.schemas import CommentSchema
-from cadetapi.controllers.database.DbResult import DbResult
-from cadetapi.controllers.database.DbDataset import DbDataset
-from cadetapi.controllers.analysis.DatasetAnalysis import DatasetAnalysis
+from ...models import ResultSet
+from ...schemas import CommentSchema
+from ..database.DbResult import DbResult
+from ..database.DbDataset import DbDataset
+from ..analysis.DatasetAnalysis import DatasetAnalysis
 
 class DatasetApi(Resource):
     def get(self, dataset_id=None):

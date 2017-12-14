@@ -5,9 +5,8 @@
 
 from flask import abort
 from flask_restful import Resource, request
-#from cadetapi.models import Comment
-from cadetapi.controllers.database.DbControl import DbComment
-from cadetapi.schemas import CommentSchema
+from ..database.DbControl import DbComment
+from ...schemas import CommentSchema
 
 class CommentApi(Resource):
     def get(self, comment_id=None):

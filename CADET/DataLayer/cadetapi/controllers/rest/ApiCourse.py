@@ -5,9 +5,8 @@
 
 from flask import abort
 from flask_restful import Resource, request
-#from cadetapi.models import Course
-from cadetapi.controllers.database.DbControl import DbCourse
-from cadetapi.schemas import CourseSchema
+from ..database.DbControl import DbCourse
+from ...schemas import CourseSchema
 
 class CourseApi(Resource):
     def get(self, course_id=None):
